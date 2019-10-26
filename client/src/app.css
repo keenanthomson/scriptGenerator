@@ -1,0 +1,35 @@
+.box {
+  width: 65%;
+}
+
+.header {
+  margin: 10px 0 20px 6px;
+}
+
+.entries {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 2fr;
+}
+
+.entry-input {
+  margin: 6px;
+  padding: 5px;
+  width: 90%;
+  border-radius: 3px;
+  border-color: black;
+  border-width: 1px;
+}
+
+.input-name {
+  padding: 0 5px;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: bold;
+}
+
+.submit {
+  font-size: 16px;
+  margin: 15px 0 0 6px;
+}
+
