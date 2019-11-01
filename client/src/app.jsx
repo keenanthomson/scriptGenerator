@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import DatePicker from "react-datepicker";
 import './app.css';
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default class App extends Component {
   constructor(props) {
@@ -12,20 +12,23 @@ export default class App extends Component {
       startDate: null,
       endDate: null,
     };
+    this.handleTestIDChange = this.handleTestIDChange.bind(this);
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
+    this.handleEndDateChange = this.handleEndDateChange.bind(this);
   };
 
   componentDidMount() {
 
   }
 
-  renderFile() {
-    // let requestBody = renderBody();
+  async renderFile() {
     let requestBody = {
       testID: this.state.testID,
       startDate: this.state.startDate,
       endDate: this.state.endDate,
-    }
+    };
+    console.log(`REQ BODY -> `, requestBody);
+    console.log(typeof requestBody);
     axios
     .post(`http://localhost:3001/api/renderfile`, requestBody)
     .then(response => {
@@ -38,27 +41,25 @@ export default class App extends Component {
   };
 
   handleStartDateChange(date) {
-    console.log(this.formatDate(date))
-    
-    //NEXT get ^^ into preferred format for SQL -> '2019-10-21'
-
-    // this.setState({startDate: e});
+    this.setState({startDate: date});
   }
 
-  formatDate(date) {
-    let splitData = new Intl.DateTimeFormat().format(date).split("/");
-    let formattedDate;
-    console.log(splitData[2])
-    for (let i = splitData.length - 1; i < 0; i--) {
-      console.log(splitData[i]) // not working as I expect, undefined instead of '2019'
-      formattedDate = formattedDate + `${splitData[i]}-`;
-    }
-    return formattedDate;
+  handleEndDateChange(date) {
+    this.setState({endDate: date});
   }
 
-  handleEndDateChange(e) {
-
-  }
+  // formatDate(date) {
+  //   let formattedDate;
+  //   let year = date.getFullYear();
+  //   let month = date.getMonth()+1;
+  //   let day = date.getDate();
+  //   if (day < 10) {
+  //     formattedDate = `${year}-${month}-0${day}`;
+  //   } else {
+  //     formattedDate = `${year}-${month}-${day}`;
+  //   }
+  //   return formattedDate;
+  // };
 
   render() {
     return(
@@ -69,8 +70,8 @@ export default class App extends Component {
           <div className="input-name"><span>Start Date</span></div>
           <div className="input-name"><span>End Date</span></div>
           <input className="entry-input" name="testID" onChange={this.handleTestIDChange}></input>
-          <DatePicker dateFormat="yyyy-mm-dd" placeholderText="select start date" className="entry-input" name="startDate" maxDate={new Date()} selected={this.state.startDate} onChange={this.handleStartDateChange}/>
-          <DatePicker dateFormat="yyyy-mm-dd" placeholderText="select end date" className="entry-input" name="endDate" selected={this.state.endDate} onChange={this.handleEndDateChange}/>
+          <DatePicker dateFormat="yyyy-MM-dd" placeholderText="select start date" className="entry-input" name="startDate" maxDate={new Date()} selected={this.state.startDate} onChange={this.handleStartDateChange}/>
+          <DatePicker dateFormat="yyyy-MM-dd" placeholderText="select end date" className="entry-input" name="endDate" selected={this.state.endDate} onChange={this.handleEndDateChange}/>
         </div>
         <input className="submit" type="submit" onClick={() => this.renderFile()}></input>
       </div>
