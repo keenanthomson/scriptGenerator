@@ -1,8 +1,8 @@
 const writeVariables = require('./writeVariables.js')
 
-function scriptGenerator(data) {
+async function scriptGenerator(data) {
 
-  writeVariables(data);
+  await writeVariables(data);
 
 };
 

@@ -11,8 +11,6 @@ app.use(express.static('./client/dist'));
 
 app.post('/api/renderfile', async (req, res) => {
 
-  console.log(req.body.platforms)
-
   await scriptGenerator(req.body);
 
   // res.download(path.join(__dirname, '/testing.sql'));

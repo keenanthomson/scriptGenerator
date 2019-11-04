@@ -9,8 +9,8 @@ function writeVariables(data) {
 
     let scriptVariables = 
 `meta SET sessionstartDate between '${startDate}' and '${endDate}';
-${testID ? 'meta SET testID = ' + testID + ";" : ''}
-${platforms ? `meta SET platformID = ` + platforms + `;` : ``}`
+${testID ? `meta SET testID = (` + testID + `);` : ``}
+${platforms ? `meta SET platformID = (` + platforms + `);` : ``}`
 
   fs.writeFile(path.join(__dirname, '/testing.sql'), scriptVariables, err => {
     if (err) {
