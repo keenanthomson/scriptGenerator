@@ -27,8 +27,6 @@ export default class App extends Component {
       startDate: this.state.startDate,
       endDate: this.state.endDate,
     };
-    console.log(`REQ BODY -> `, requestBody);
-    console.log(typeof requestBody);
     axios
     .post(`http://localhost:3001/api/renderfile`, requestBody)
     .then(response => {
@@ -47,19 +45,6 @@ export default class App extends Component {
   handleEndDateChange(date) {
     this.setState({endDate: date});
   }
-
-  // formatDate(date) {
-  //   let formattedDate;
-  //   let year = date.getFullYear();
-  //   let month = date.getMonth()+1;
-  //   let day = date.getDate();
-  //   if (day < 10) {
-  //     formattedDate = `${year}-${month}-0${day}`;
-  //   } else {
-  //     formattedDate = `${year}-${month}-${day}`;
-  //   }
-  //   return formattedDate;
-  // };
 
   render() {
     return(
