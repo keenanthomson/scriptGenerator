@@ -16,7 +16,7 @@
 .entries {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 1.5fr 2fr 1.5fr 2fr;
+  grid-template-rows: 1.5fr 2fr 1.5fr 4.25fr;
 }
 
 .entry-input {
@@ -47,3 +47,6 @@
   margin: 15px 0 0 6px;
 }
 
+.checkbox-div {
+  margin: 3px 0 0 3px;
+}

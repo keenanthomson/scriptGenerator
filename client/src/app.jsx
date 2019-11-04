@@ -87,22 +87,22 @@ export default class App extends Component {
           <div className="input-name"><span>Platform(s)</span></div>
           <div className="input-name"><span>Device(s)</span></div>
           <div className="input-name"><span>Operating System(s)</span></div>
-          <select className="entry-input" onChange={this.handlePlatformChange}>
-            <option value="1">Desktop</option>
-            <option value="2">Mweb</option>
-            <option value="3">App</option>
-          </select>
-          <select className="entry-input" onChange={this.handleDeviceChange}>
-            <option value="">Desktop</option>
-            <option value="">Tablet</option>
-            <option value="">Mobile</option>
-          </select>
-          <select className="entry-input" onChange={this.handleOSChange}>
-            <option value="">Windows</option>
-            <option value="">OS X</option>
-            <option value="">iOS</option>
-            <option value="">Android</option>
-          </select>
+          <div className="checkbox-div" onChange={this.handlePlatformChange}>
+            <input type="checkbox" value="1"/> Desktop<br/>
+            <input type="checkbox" value="2"/> Mweb<br/>
+            <input type="checkbox" value="3"/> App
+          </div>
+          <div className="checkbox-div" onChange={this.handleDeviceChange}>
+            <input type="checkbox" value="1"/> Desktop<br/>
+            <input type="checkbox" value="2"/> Tablet<br/>
+            <input type="checkbox" value="3"/> Phone
+          </div>
+          <div className="checkbox-div" onChange={this.handleOSChange}>
+            <input type="checkbox" value=""/> Windows<br/>
+            <input type="checkbox" value=""/> OS X<br/>
+            <input type="checkbox" value=""/> iOS<br/>
+            <input type="checkbox" value=""/> Android
+          </div>
         </div>
         <input className="submit" type="submit" onClick={() => this.renderFile()}></input>
       </div>
