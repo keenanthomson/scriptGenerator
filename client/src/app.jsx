@@ -76,7 +76,7 @@ export default class App extends Component {
   render() {
     return(
       <div className="box">
-        <div className="header">A/B Test Analysis -- SQL Script Generator</div>
+        <div className="header">SQL Script Generator</div>
         <div className="entries">
           <div className="input-name"><span>TestID</span></div>
           <div className="input-name"><span>Start Date</span></div>
@@ -98,8 +98,8 @@ export default class App extends Component {
             <input type="checkbox" value="3"/> Phone
           </div>
           <div className="checkbox-div" onChange={this.handleOSChange}>
-            <input type="checkbox" value=""/> Windows<br/>
-            <input type="checkbox" value=""/> OS X<br/>
+            <input type="checkbox" value="1"/> Windows<br/>
+            <input type="checkbox" value="2"/> OS X<br/>
             <input type="checkbox" value=""/> iOS<br/>
             <input type="checkbox" value=""/> Android
           </div>

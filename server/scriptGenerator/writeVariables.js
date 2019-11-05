@@ -2,13 +2,15 @@ const path = require('path');
 const fs = require('fs');
 
 function writeVariables(data) {
+  console.log(data)
   let testID = data.testID;
   let startDate = formatDate(data.startDate);
   let endDate = formatDate(data.endDate);
   let platforms = data.platforms;
 
     let scriptVariables = 
-`meta SET sessionstartDate between '${startDate}' and '${endDate}';
+`settarget webvertica;
+meta SET sessionstartDate between '${startDate}' and '${endDate}';
 ${testID ? `meta SET testID = (` + testID + `);` : ``}
 ${platforms ? `meta SET platformID = (` + platforms + `);` : ``}`
 
