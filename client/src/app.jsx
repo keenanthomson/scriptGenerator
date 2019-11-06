@@ -76,8 +76,14 @@ export default class App extends Component {
   render() {
     return(
       <div className="box">
-        <div className="header">SQL Script Generator</div>
+        <div className="header">SQL Script Generator<br/>PDP Customer- and Session-level Test KPIs</div>
         <div className="entries">
+        <div className="input-name"><span>Analyst Initials</span></div>
+          <div className="input-name"><span>Test Name</span></div>
+          <div></div>
+          <input className="entry-input" name="initials" onChange={this.handleInitialChange}></input>
+          <input className="entry-input" name="testName" onChange={this.handleTestNameChange}></input>
+          <div></div>
           <div className="input-name"><span>TestID</span></div>
           <div className="input-name"><span>Start Date</span></div>
           <div className="input-name"><span>End Date</span></div>
@@ -100,8 +106,10 @@ export default class App extends Component {
           <div className="checkbox-div" onChange={this.handleOSChange}>
             <input type="checkbox" value="1"/> Windows<br/>
             <input type="checkbox" value="2"/> OS X<br/>
-            <input type="checkbox" value=""/> iOS<br/>
-            <input type="checkbox" value=""/> Android
+            <input type="checkbox" value="3"/> Linux<br/>
+            <input type="checkbox" value="4"/> Chrome OS<br/>
+            <input type="checkbox" value="5"/> iOS<br/>
+            <input type="checkbox" value="6"/> Android
           </div>
         </div>
         <input className="submit" type="submit" onClick={() => this.renderFile()}></input>
