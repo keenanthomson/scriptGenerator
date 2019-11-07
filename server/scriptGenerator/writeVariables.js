@@ -3,16 +3,19 @@ const fs = require('fs');
 
 function writeVariables(data) {
   console.log(data)
+  let vars = [];
   let testID = data.testID;
   let startDate = formatDate(data.startDate);
   let endDate = formatDate(data.endDate);
-  let platforms = data.platforms;
+  vars.push(data.platforms, data.platforms, data.devices);
 
     let scriptVariables = 
 `settarget webvertica;
-meta SET sessionstartDate between '${startDate}' and '${endDate}';
-${testID ? `meta SET testID = (` + testID + `);` : ``}
-${platforms ? `meta SET platformID = (` + platforms + `);` : ``}`
+meta SET sessionstartDate between '${startDate}' and '${endDate}';`
+// ${}`
+
+// ${testID ? `meta SET testID = (` + testID + `);` : ``}
+// ${platforms ? `meta SET platformID = (` + platforms + `);` : ``}`
 
   fs.writeFile(path.join(__dirname, '/testing.sql'), scriptVariables, err => {
     if (err) {

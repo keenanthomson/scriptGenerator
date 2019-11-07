@@ -11,9 +11,9 @@ export default class App extends Component {
       testID: null,
       startDate: null,
       endDate: null,
-      platforms: null,
-      devices: null,
-      OS: null,
+      platforms: [],
+      devices: [],
+      OS: [],
     };
     this.handleTestIDChange = this.handleTestIDChange.bind(this);
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
@@ -70,7 +70,16 @@ export default class App extends Component {
   };
 
   handleOSChange(e) {
-    this.setState({OS: e.target.value});
+    let value = Number(e.target.value);
+    let state = this.state.OS;
+    if (state.indexOf(value) >= 0) {
+      let index = state.indexOf(value);
+      state.splice(index, 1);
+      this.setState({OS: state});
+    } else {
+      state.push(value);
+      this.setState({OS: state});
+    };
   };
 
   render() {
