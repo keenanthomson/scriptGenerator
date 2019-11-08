@@ -2,24 +2,21 @@ const path = require('path');
 const fs = require('fs');
 
 function writeVariables(data) {
-  console.log(data)
-  let vars = [];
-  let testID = data.testID;
+  console.log(data);
   let startDate = formatDate(data.startDate);
   let endDate = formatDate(data.endDate);
-  vars.push(data.platforms, data.platforms, data.devices);
-
-    let scriptVariables = 
-`settarget webvertica;
-meta SET sessionstartDate between '${startDate}' and '${endDate}';`
-// ${}`
-
-// ${testID ? `meta SET testID = (` + testID + `);` : ``}
-// ${platforms ? `meta SET platformID = (` + platforms + `);` : ``}`
+  let scriptVariables = `settarget webvertica;`
+  scriptVariables = scriptVariables + `\nmeta SET SessDateFilter = (sessionstartDate between '${startDate}' and '${endDate}');`
+  if (data.testID) scriptVariables = scriptVariables + `\nmeta SET testFilter = (${data.testID});`;
+  if (data.platforms) scriptVariables = scriptVariables + `\nmeta SET platformFilter = (${data.platforms});`;
+  if (data.stores) scriptVariables = scriptVariables + `\nmeta SET storeFilter = (${data.stores});`
+  if (data.devices) scriptVariables = scriptVariables + `\nmeta SET deviceFilter = (${data.devices});`;
+  if (data.OS) scriptVariables = scriptVariables + `\nmeta SET osFilter = (${data.OS});`;
+  scriptVariables = scriptVariables + `\n\nBEGIN;\n\n`;
 
   fs.writeFile(path.join(__dirname, '/testing.sql'), scriptVariables, err => {
     if (err) {
-      console.log(`Error: `, err);
+      console.log(`Error writing script variables: `, err);
     };
   });
 };
