@@ -44,7 +44,6 @@ export default class App extends Component {
       OS: this.state.OS,
     };
 
-    console.log(requestBody)
     axios
     .post(`http://localhost:3001/api/renderfile`, requestBody)
     .then(response => {
