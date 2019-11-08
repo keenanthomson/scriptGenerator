@@ -1,47 +1,35 @@
-import React, {Component} from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DatePicker from "react-datepicker";
 import './app.css';
 import 'react-datepicker/dist/react-datepicker.css';
 
-export default class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      testID: null,
-      startDate: null,
-      endDate: null,
-      platforms: [],
-      devices: [],
-      stores: [],
-      OS: [],
-    };
-    this.handleTestIDChange = this.handleTestIDChange.bind(this);
-    this.handleStartDateChange = this.handleStartDateChange.bind(this);
-    this.handleEndDateChange = this.handleEndDateChange.bind(this);
-    this.handlePlatformChange = this.handlePlatformChange.bind(this);
-    this.handleDeviceChange = this.handleDeviceChange.bind(this);
-    this.handleStoreChange = this.handleStoreChange.bind(this);
-    this.handleOSChange = this.handleOSChange.bind(this);
-  };
+export default function App() {
+  const [Initials, setInitials] = useState(null);
+  const [TestName, setTestName] = useState(null);
+  const [TestID, setTestID] = useState(null);
+  const [StartDate, setStartDate] = useState(null);
+  const [EndDate, setEndDate] = useState(null);
+  const [Platforms, setPlatforms] = useState([]);
+  const [Devices, setDevices] = useState([]);
+  const [Stores, setStores] = useState([]);
+  const [OS, setOS] = useState([]);
 
-  // componentDidMount() {
-
-  // }
-
-  renderFile() {
-    if (!this.state.startDate | !this.state.endDate) {
+  function renderFile () {
+    if (!startDate | !endDate) {
       return alert(`You must select a Start and End Date.`);
     };
 
     let requestBody = {
-      startDate: this.state.startDate,
-      endDate: this.state.endDate,
-      testID: this.state.testID,
-      platforms: this.state.platforms,
-      devices: this.state.devices,
-      stores: this.state.stores,
-      OS: this.state.OS,
+      initials: Initials,
+      testName: TestName,
+      startDate: StartDate,
+      endDate: EndDate,
+      testID: TestID,
+      platforms: Platforms,
+      devices: Devices,
+      stores: Stores,
+      OS: OS,
     };
 
     axios
@@ -51,48 +39,43 @@ export default class App extends Component {
     });
   };
 
-  handleTestIDChange(e) {
-    this.setState({testID: e.target.value});
+  function handleStartDateChange(date) {
+    setStartDate(date);
   };
 
-  handleStartDateChange(date) {
-    this.setState({startDate: date});
+  function handleEndDateChange(date) {
+    setEndDate(date);
   };
 
-  handleEndDateChange(date) {
-    this.setState({endDate: date});
+  function handlePlatformChange(e) {
+    updateStateArray(e, Platforms);
   };
 
-  handlePlatformChange(e) {
-    this.updateStateArray(e, this.state.platforms);
+  function handleDeviceChange(e) {
+    updateStateArray(e, Devices);
   };
 
-  handleDeviceChange(e) {
-    this.updateStateArray(e, this.state.devices);
+  function handleStoreChange(e) {
+    updateStateArray(e, Stores);
   };
 
-  handleStoreChange(e) {
-    this.updateStateArray(e, this.state.stores);
+  function handleOSChange(e) {
+    updateStateArray(e, OS);
   };
 
-  handleOSChange(e) {
-    this.updateStateArray(e, this.state.OS);
-  };
-
-  updateStateArray(e, stateToUpdate) {
+  function updateStateArray(e, stateToUpdate) {
     let value = Number(e.target.value);
     let state = stateToUpdate;
     if (state.indexOf(value) >= 0) {
       let index = state.indexOf(value);
       state.splice(index, 1);
-      this.setState({stateToUpdate: state});
+      `set${stateToUpdate}`(state);
     } else {
       state.push(value);
-      this.setState({stateToUpdate: state});
+      `set${stateToUpdate}`(state);
     };
   };
 
-  render() {
     return(
       <div className="box">
         <div className="header">SQL Script Generator<br/><br/>PDP Customer- and Session-level Test KPIs</div>
@@ -101,33 +84,33 @@ export default class App extends Component {
           <div className="input-name"><span>Test Name</span></div>
           <div></div>
           <div></div>
-          <input className="entry-input" name="initials" onChange={this.handleInitialChange}></input>
-          <input className="entry-input" name="testName" onChange={this.handleTestNameChange}></input>
+          <input className="entry-input" name="initials" onChange={(e) => setInitials(e.target.value)}></input>
+          <input className="entry-input" name="testName" onChange={(e) => setTestName(e.target.value)}></input>
           <div></div>
           <div></div>
           <div className="input-name"><span>TestID</span></div>
           <div className="input-name"><span>Start Date</span></div>
           <div className="input-name"><span>End Date</span></div>
           <div></div>
-          <input className="entry-input" name="testID" onChange={this.handleTestIDChange}></input>
-          <DatePicker dateFormat="yyyy-MM-dd" placeholderText="select start date" className="entry-input" name="startDate" maxDate={new Date()} selected={this.state.startDate} onChange={this.handleStartDateChange}/>
-          <DatePicker dateFormat="yyyy-MM-dd" placeholderText="select end date" className="entry-input" name="endDate" minDate={this.state.startDate} maxDate={new Date()} selected={this.state.endDate} onChange={this.handleEndDateChange}/>
+          <input className="entry-input" name="testID" onChange={(e) => setTestID(e.target.value)}></input>
+          <DatePicker dateFormat="yyyy-MM-dd" placeholderText="select start date" className="entry-input" name="startDate" maxDate={new Date()} selected={StartDate} onChange={(e) => setStartDate(e)}/>
+          <DatePicker dateFormat="yyyy-MM-dd" placeholderText="select end date" className="entry-input" name="endDate" minDate={StartDate} maxDate={new Date()} selected={EndDate} onChange={(e) => setEndDate(e)}/>
           <div></div>
           <div className="input-name"><span>Platform(s)</span></div>
           <div className="input-name"><span>Device(s)</span></div>
           <div className="input-name"><span>Store(s)</span></div>
           <div className="input-name"><span>Operating System(s)</span></div>
-          <div className="checkbox-div" onChange={this.handlePlatformChange}>
+          <div className="checkbox-div" onChange={(e) => handlePlatformChange(e)}>
             <input type="checkbox" value="1"/> Desktop<br/>
             <input type="checkbox" value="2"/> Mweb<br/>
             <input type="checkbox" value="3"/> App
           </div>
-          <div className="checkbox-div" onChange={this.handleDeviceChange}>
+          <div className="checkbox-div" onChange={(e) => handleDeviceChange(e)}>
             <input type="checkbox" value="1"/> Desktop<br/>
             <input type="checkbox" value="2"/> Tablet<br/>
             <input type="checkbox" value="3"/> Phone
           </div>
-          <div className="checkbox-div" onChange={this.handleStoreChange}>
+          <div className="checkbox-div" onChange={(e) => handleStoreChange(e)}>
             <input type="checkbox" value="49"/> Wayfair<br/>
             <input type="checkbox" value="321"/> Wayfair UK<br/>
             <input type="checkbox" value="446"/> Wayfair CA<br/>
@@ -137,7 +120,7 @@ export default class App extends Component {
             <input type="checkbox" value="422"/> Birch Lane<br/>
             <input type="checkbox" value="457"/> Perigold
           </div>
-          <div className="checkbox-div" onChange={this.handleOSChange}>
+          <div className="checkbox-div" onChange={(e) => handleOSChange(e)}>
             <input type="checkbox" value="1"/> Windows<br/>
             <input type="checkbox" value="2"/> OS X<br/>
             <input type="checkbox" value="3"/> Linux<br/>
@@ -146,8 +129,7 @@ export default class App extends Component {
             <input type="checkbox" value="6"/> Android
           </div>
         </div>
-        <input className="submit" type="submit" onClick={() => this.renderFile()}></input>
+        <input className="submit" type="submit" onClick={() => renderFile()}></input>
       </div>
     )
-  };
 };

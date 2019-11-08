@@ -14,7 +14,7 @@ function writeVariables(data) {
   if (data.OS) scriptVariables = scriptVariables + `\nmeta SET osFilter = (${data.OS});`;
   scriptVariables = scriptVariables + `\n\nBEGIN;\n\n`;
 
-  fs.writeFile(path.join(__dirname, '/testing.sql'), scriptVariables, err => {
+  fs.writeFileSync(path.join(__dirname, '/testing.sql'), scriptVariables, err => {
     if (err) {
       console.log(`Error writing script variables: `, err);
     };
