@@ -8,10 +8,10 @@ function writeVariables(data) {
   let scriptVariables = `settarget webvertica;`
   scriptVariables = scriptVariables + `\nmeta SET SessDateFilter = (sessionstartDate between '${startDate}' and '${endDate}');`
   if (data.testID) scriptVariables = scriptVariables + `\nmeta SET testFilter = (${data.testID});`;
-  if (data.platforms) scriptVariables = scriptVariables + `\nmeta SET platformFilter = (${data.platforms});`;
-  if (data.stores) scriptVariables = scriptVariables + `\nmeta SET storeFilter = (${data.stores});`
-  if (data.devices) scriptVariables = scriptVariables + `\nmeta SET deviceFilter = (${data.devices});`;
-  if (data.OS) scriptVariables = scriptVariables + `\nmeta SET osFilter = (${data.OS});`;
+  if (data.platforms.length > 0) scriptVariables = scriptVariables + `\nmeta SET platformFilter = (${data.platforms});`;
+  if (data.stores.length > 0) scriptVariables = scriptVariables + `\nmeta SET storeFilter = (${data.stores});`
+  if (data.devices.length > 0) scriptVariables = scriptVariables + `\nmeta SET deviceFilter = (${data.devices});`;
+  if (data.OS.length > 0) scriptVariables = scriptVariables + `\nmeta SET osFilter = (${data.OS});`;
   scriptVariables = scriptVariables + `\n\nBEGIN;\n\n`;
 
   fs.writeFileSync(path.join(__dirname, '/testing.sql'), scriptVariables, err => {

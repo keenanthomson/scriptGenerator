@@ -16,20 +16,20 @@ export default function App() {
   const [OS, setOS] = useState([]);
 
   function renderFile () {
-    if (!startDate | !endDate) {
+    if (!StartDate | !EndDate) {
       return alert(`You must select a Start and End Date.`);
     };
 
     let requestBody = {
-      initials: Initials,
-      testName: TestName,
+      initials: Initials || undefined,
+      testName: TestName || undefined,
+      testID: TestID || undefined,
       startDate: StartDate,
       endDate: EndDate,
-      testID: TestID,
       platforms: Platforms,
       devices: Devices,
       stores: Stores,
-      OS: OS,
+      OS: OS
     };
 
     axios
@@ -39,40 +39,15 @@ export default function App() {
     });
   };
 
-  function handleStartDateChange(date) {
-    setStartDate(date);
-  };
-
-  function handleEndDateChange(date) {
-    setEndDate(date);
-  };
-
-  function handlePlatformChange(e) {
-    updateStateArray(e, Platforms);
-  };
-
-  function handleDeviceChange(e) {
-    updateStateArray(e, Devices);
-  };
-
-  function handleStoreChange(e) {
-    updateStateArray(e, Stores);
-  };
-
-  function handleOSChange(e) {
-    updateStateArray(e, OS);
-  };
-
-  function updateStateArray(e, stateToUpdate) {
+  function updateStateArray(e, state, setStateFunc) {
     let value = Number(e.target.value);
-    let state = stateToUpdate;
     if (state.indexOf(value) >= 0) {
       let index = state.indexOf(value);
       state.splice(index, 1);
-      `set${stateToUpdate}`(state);
+      setStateFunc(state);
     } else {
       state.push(value);
-      `set${stateToUpdate}`(state);
+      setStateFunc(state);
     };
   };
 
@@ -100,17 +75,17 @@ export default function App() {
           <div className="input-name"><span>Device(s)</span></div>
           <div className="input-name"><span>Store(s)</span></div>
           <div className="input-name"><span>Operating System(s)</span></div>
-          <div className="checkbox-div" onChange={(e) => handlePlatformChange(e)}>
+          <div className="checkbox-div" onChange={(e) => updateStateArray(e, Platforms, setPlatforms)}>
             <input type="checkbox" value="1"/> Desktop<br/>
             <input type="checkbox" value="2"/> Mweb<br/>
             <input type="checkbox" value="3"/> App
           </div>
-          <div className="checkbox-div" onChange={(e) => handleDeviceChange(e)}>
+          <div className="checkbox-div" onChange={(e) => updateStateArray(e, Devices, setDevices)}>
             <input type="checkbox" value="1"/> Desktop<br/>
             <input type="checkbox" value="2"/> Tablet<br/>
             <input type="checkbox" value="3"/> Phone
           </div>
-          <div className="checkbox-div" onChange={(e) => handleStoreChange(e)}>
+          <div className="checkbox-div" onChange={(e) => updateStateArray(e, Stores, setStores)}>
             <input type="checkbox" value="49"/> Wayfair<br/>
             <input type="checkbox" value="321"/> Wayfair UK<br/>
             <input type="checkbox" value="446"/> Wayfair CA<br/>
@@ -120,7 +95,7 @@ export default function App() {
             <input type="checkbox" value="422"/> Birch Lane<br/>
             <input type="checkbox" value="457"/> Perigold
           </div>
-          <div className="checkbox-div" onChange={(e) => handleOSChange(e)}>
+          <div className="checkbox-div" onChange={(e) => updateStateArray(e, OS, setOS)}>
             <input type="checkbox" value="1"/> Windows<br/>
             <input type="checkbox" value="2"/> OS X<br/>
             <input type="checkbox" value="3"/> Linux<br/>
