@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 function writeVariables(data) {
-  console.log(data);
+  console.log(data)
   let startDate = formatDate(data.startDate);
   let endDate = formatDate(data.endDate);
   let scriptVariables = `settarget webvertica;`
@@ -12,6 +12,11 @@ function writeVariables(data) {
   if (data.stores.length > 0) scriptVariables = scriptVariables + `\nmeta SET storeFilter = (${data.stores});`
   if (data.devices.length > 0) scriptVariables = scriptVariables + `\nmeta SET deviceFilter = (${data.devices});`;
   if (data.OS.length > 0) scriptVariables = scriptVariables + `\nmeta SET osFilter = (${data.OS});`;
+  scriptVariables = scriptVariables + `\nmeta SET matchbackDays = 14;`;
+  scriptVariables = scriptVariables + `\nmeta SET tblMbOutcomes = csn_junk.tblMb14Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
+  scriptVariables = scriptVariables + `\nmeta SET tblSessOutcomes = csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'nodata.TestName'};`;
+  scriptVariables = scriptVariables + `\nmeta SET tblGRSVCD_store = csn_junk.tblGRSVCDstore_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
+  scriptVariables = scriptVariables + `\nmeta SET tblGRSVCD_storeXvisitor = csn_junk.tblGRSVCDstoreXvisitor_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
   scriptVariables = scriptVariables + `\n\nBEGIN;\n\n`;
 
   fs.writeFileSync(path.join(__dirname, '/testing.sql'), scriptVariables, err => {
