@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const path = require('path');
+const fs = require('fs');
 const port = 3001;
 const scriptGenerator = require('./scriptGenerator/scriptGenerator.js');
 
@@ -9,13 +11,19 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(express.static('./client/dist'));
 
-app.post('/api/renderfile', async (req, res) => {
+app.post('/api/renderfile', (req, res) => {
 
-  await scriptGenerator(req.body);
+  scriptGenerator(req.body, () => {
+    fs.readFile(path.join(__dirname, '/scriptGenerator/testing.sql'), (err, data) => {
+    if (err) {
+      console.log(`Readfile error: `, err)
+    } else {
+      res.send(data);
+      console.log(`data sent @ ${Date.now()}`)
+    };
+    })
+  })
 
-  // res.download(path.join(__dirname, '/testing.sql'));
-
-  await res.send("Server here!");
 });
 
 app.listen(port, () => {

@@ -1,11 +1,13 @@
 const path = require('path');
 const fs = require('fs');
-// const MbScriptBody = require('./MbScriptBody.txt');
 
-function writeMbScript() {
-
-  fs.appendFileSync(path.join(__dirname, '/testing.sql'), path.join(__dirname, '/'), err => {
-    console.log(`Error writing MbScript: `, err);
+function writeMbScript(cb) {
+  fs.readFile(path.join(__dirname, '/scriptText/MbScriptBody.sql'), (err, data) => {
+    if (err) console.log(`readFile error: `, err);
+    fs.appendFile(path.join(__dirname, '/testing.sql'), data, err => {
+      if (err) console.log(`appendFile error: `, err);
+      else cb();
+    });
   });
 };
 

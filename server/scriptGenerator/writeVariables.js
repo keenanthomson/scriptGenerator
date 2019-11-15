@@ -2,7 +2,6 @@ const path = require('path');
 const fs = require('fs');
 
 function writeVariables(data) {
-  console.log(data)
   let startDate = formatDate(data.startDate);
   let endDate = formatDate(data.endDate);
   let scriptVariables = `settarget webvertica;`
@@ -19,10 +18,12 @@ function writeVariables(data) {
   scriptVariables = scriptVariables + `\nmeta SET tblGRSVCD_storeXvisitor = csn_junk.tblGRSVCDstoreXvisitor_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
   scriptVariables = scriptVariables + `\n\nBEGIN;\n\n`;
 
-  fs.writeFileSync(path.join(__dirname, '/testing.sql'), scriptVariables, err => {
+  fs.writeFile(path.join(__dirname, '/testing.sql'), scriptVariables, err => {
     if (err) {
       console.log(`Error writing script variables: `, err);
-    };
+    } else {
+      console.log(`write variables @ ${Date.now()}`);
+    }
   });
 };
 

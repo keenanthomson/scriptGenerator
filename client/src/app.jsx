@@ -14,6 +14,8 @@ export default function App() {
   const [Devices, setDevices] = useState([]);
   const [Stores, setStores] = useState([]);
   const [OS, setOS] = useState([]);
+  const [script1, setScript1] = useState(null);
+  const [script2, setScript2] = useState(null);
 
   function renderFile () {
     if (!StartDate | !EndDate) {
@@ -29,13 +31,14 @@ export default function App() {
       platforms: Platforms,
       devices: Devices,
       stores: Stores,
-      OS: OS
+      OS: OS,
     };
 
     axios
     .post(`http://localhost:3001/api/renderfile`, requestBody)
     .then(response => {
       console.log(`Server Response: ${response.data}`);
+      setScript1(response.data);
     });
   };
 

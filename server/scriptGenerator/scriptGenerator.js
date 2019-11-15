@@ -1,10 +1,12 @@
 const writeVariables = require('./writeVariables.js');
 const writeMbScript = require('./writeMbScript.js');
 
-async function scriptGenerator(data) {
+function scriptGenerator(data, cb) {
 
-  await writeVariables(data);
-  await writeMbScript()
+    writeVariables(data)
+    writeMbScript(() => {
+      cb();
+    });
 
 };
 
