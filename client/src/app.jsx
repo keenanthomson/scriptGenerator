@@ -54,6 +54,12 @@ export default function App() {
     };
   };
 
+  function MbScriptPreview() {
+    if (script1) {
+      return <div>{script1}</div>
+    };
+  };
+
     return(
       <div className="box">
         <div className="header">SQL Script Generator<br/><br/>PDP Customer- and Session-level Test KPIs</div>
@@ -108,6 +114,9 @@ export default function App() {
           </div>
         </div>
         <input className="submit" type="submit" onClick={() => renderFile()}></input>
+        <div>
+          {MbScriptPreview()}
+        </div>
       </div>
     )
 };
