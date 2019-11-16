@@ -37,7 +37,7 @@ export default function App() {
     axios
     .post(`http://localhost:3001/api/renderfile`, requestBody)
     .then(response => {
-      console.log(`Server Response: ${response.data}`);
+      // console.log(`Server Response: ${response.data}`);
       setScript1(response.data);
     });
   };
@@ -56,8 +56,27 @@ export default function App() {
 
   function MbScriptPreview() {
     if (script1) {
-      return <div>{script1}</div>
+      return <pre id="script1Preview">
+        <textarea>
+          {script1}
+        </textarea>
+      </pre>
     };
+  };
+
+  function MbScriptButton() {
+    if (script1) {
+      return <input className="button" type="button" value="Copy Script" onClick={() => copyScript1()}></input>
+    };
+  };
+
+  function copyScript1() {
+    let copy_text = document.getElementById("script1Preview");
+    let range = document.createRange();
+    range.selectNode(copy_text);
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    alert(`Script copied to clipboard.`);
   };
 
     return(
@@ -113,7 +132,10 @@ export default function App() {
             <input type="checkbox" value="6"/> Android
           </div>
         </div>
-        <input className="submit" type="submit" onClick={() => renderFile()}></input>
+        <div className='button-grid'>
+          <input className="button" type="submit" onClick={() => renderFile()}></input>
+          {MbScriptButton()}
+        </div>
         <div>
           {MbScriptPreview()}
         </div>

@@ -12,18 +12,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('./client/dist'));
 
 app.post('/api/renderfile', (req, res) => {
-
   scriptGenerator(req.body, () => {
     fs.readFile(path.join(__dirname, '/scriptGenerator/testing.sql'), (err, data) => {
-    if (err) {
-      console.log(`Readfile error: `, err)
-    } else {
-      res.send(data);
-      console.log(`data sent @ ${Date.now()}`)
-    };
-    })
-  })
-
+      if (err) {
+        console.log(`Readfile error: `, err)
+      } else {
+        res.send(data);
+      };
+    });
+  });
 });
 
 app.listen(port, () => {

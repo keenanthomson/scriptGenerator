@@ -1,5 +1,5 @@
 settarget webvertica;
-meta SET SessDateFilter = (sessionstartDate between '2019-11-01' and '2019-11-14');
+meta SET SessDateFilter = (sessionstartDate between '2019-10-31' and '2019-11-15');
 meta SET matchbackDays = 14;
 meta SET tblMbOutcomes = csn_junk.tblMb14Day_noInitials_noTestName;
 meta SET tblSessOutcomes = csn_junk.tblSess_noInitials_nodata.TestName;

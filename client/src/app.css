@@ -44,12 +44,20 @@
   margin: auto;
 }
 
-.submit {
+.button-grid {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr 1fr;
+  margin: 20px 80% 0 0;
+}
+
+.button {
   font-size: 16px;
   margin: 15px 0 0 0;
   border-radius: 5px;
   color: #24292e;
   background-color: #eff3f6;
+  margin: 0 10px 0 0;
 }
 
 .checkbox-div {
@@ -63,4 +71,8 @@
 
 .checkbox-vars::selection {
   background-color: rgb(268, 268, 268);
+}
+
+pre {
+  font-size: 14px;
 }
