@@ -56,11 +56,12 @@ export default function App() {
 
   function MbScriptPreview() {
     if (script1) {
-      return <pre id="script1Preview">
-        <textarea>
-          {script1}
-        </textarea>
-      </pre>
+      return (
+        <pre>
+          <textarea id="script1Preview" value={script1}>
+          </textarea>
+        </pre>
+      )
     };
   };
 
@@ -72,9 +73,7 @@ export default function App() {
 
   function copyScript1() {
     let copy_text = document.getElementById("script1Preview");
-    let range = document.createRange();
-    range.selectNode(copy_text);
-    window.getSelection().addRange(range);
+    copy_text.select()
     document.execCommand('copy');
     alert(`Script copied to clipboard.`);
   };
