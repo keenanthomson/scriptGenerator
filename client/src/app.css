@@ -69,10 +69,7 @@
   background-color: rgb(268, 268, 268);
 }
 
-.checkbox-vars::selection {
-  background-color: rgb(268, 268, 268);
-}
-
 pre {
   font-size: 14px;
 }
+

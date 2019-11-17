@@ -17,7 +17,7 @@ export default function App() {
   const [script1, setScript1] = useState(null);
   const [script2, setScript2] = useState(null);
 
-  function renderFile () {
+  function renderScript () {
     if (!StartDate | !EndDate) {
       return alert(`You must select a Start and End Date.`);
     };
@@ -37,7 +37,6 @@ export default function App() {
     axios
     .post(`http://localhost:3001/api/renderfile`, requestBody)
     .then(response => {
-      // console.log(`Server Response: ${response.data}`);
       setScript1(response.data);
     });
   };
@@ -56,12 +55,7 @@ export default function App() {
 
   function MbScriptPreview() {
     if (script1) {
-      return (
-        <pre>
-          <textarea id="script1Preview" value={script1}>
-          </textarea>
-        </pre>
-      )
+      return <pre>{script1}</pre>
     };
   };
 
@@ -72,10 +66,9 @@ export default function App() {
   };
 
   function copyScript1() {
-    let copy_text = document.getElementById("script1Preview");
-    copy_text.select()
-    document.execCommand('copy');
-    alert(`Script copied to clipboard.`);
+    navigator.clipboard.writeText(script1).then(() => {
+      alert(`Script copied to clipboard.`)
+    });
   };
 
     return(
@@ -132,7 +125,7 @@ export default function App() {
           </div>
         </div>
         <div className='button-grid'>
-          <input className="button" type="submit" onClick={() => renderFile()}></input>
+          <input className="button" type="submit" onClick={() => renderScript()}></input>
           {MbScriptButton()}
         </div>
         <div>
