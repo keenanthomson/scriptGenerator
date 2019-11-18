@@ -1,5 +1,10 @@
 settarget webvertica;
-meta SET SessDateFilter = (sessionstartDate between '2019-11-01' and '2019-11-15');
+meta SET SessDateFilter = (sessionstartDate between '2019-10-31' and '2019-11-07');
+meta SET testFilter = (1234);
+meta SET platformFilter = (1);
+meta SET storeFilter = (446);
+meta SET deviceFilter = (2);
+meta SET osFilter = (1,2);
 meta SET matchbackDays = 14;
 meta SET tblMbOutcomes = csn_junk.tblMb14Day_noInitials_noTestName;
 meta SET tblSessOutcomes = csn_junk.tblSess_noInitials_nodata.TestName;
@@ -8,51 +13,50 @@ meta SET tblGRSVCD_storeXvisitor = csn_junk.tblGRSVCDstoreXvisitor_noInitials_no
 
 BEGIN;
 
+
 DROP TABLE IF EXISTS tmpSessionSet; 
 CREATE LOCAL TEMPORARY TABLE tmpSessionSet ON COMMIT PRESERVE ROWS AS /*+ direct */
 SELECT
-	 a.SessionStartDate
-	,a.Event_SoID
-	,a.Event_SessionKey
-	,a.TestGroupName
-	,a.ControlGroup AS isControlGroup
-	,a.CuID
-	,MIN(a.Event_Timestamp) AS MinTimeStamp
-	,CASE WHEN a.CuID = b.CuID THEN 1 ELSE 0 END AS excludeCustomer
+  a.SessionStartDate
+  ,a.Event_SoID
+  ,a.Event_SessionKey
+  ,a.TestGroupName
+  ,a.ControlGroup AS isControlGroup
+  ,a.CuID
+  ,MIN(a.Event_Timestamp) AS MinTimeStamp
+  ,CASE WHEN a.CuID = b.CuID THEN 1 ELSE 0 END AS excludeCustomer
 FROM csn_clickstream.tblDashClicks_Libra AS a
 INNER JOIN csn_warp.tblPDP_ProductView AS b
-	ON a.SessionStartDate = b.SessionStartDate
-	AND a.Event_SoID = b.Event_SoID
-	AND a.Event_SessionKey = b.Event_SessionKey
-	AND a.Event_PrSKU = b.Event_PrSKU
+  ON a.SessionStartDate = b.SessionStartDate
+  AND a.Event_SoID = b.Event_SoID
+  AND a.Event_SessionKey = b.Event_SessionKey
+  AND a.Event_PrSKU = b.Event_PrSKU
 WHERE {{SessDateFilter}}
-	AND a.event_SoID IN {{soidFilter}}
-	AND b.PlatformID IN {{platformFilter}}
-	AND b.DeviceTypeID IN {{deviceFilter}}
-	AND a.TestID IN {{ testFilter }}
-	AND a.ModalClick = 0 --Do not need individual eventTypes
-	AND a.event_pagetype IN (
-/* UPDATE PDP PAGES OF INTEREST HERE */
-		'PRODUCTSIMPLESKU'
-	    ,'PRODUCTSIMPLESKUPDX'
-		,'PRODUCTOPTIONSKU'
-	    ,'PRODUCTOPTIONSKUPDX'
-	    ,'PRODUCTKIT'
-	    ,'PRODUCTKITPDX'
-	    ,'SALECLEARANCEPRODUCTPAGE'
-	    ,'SALECLEARANCEPRODUCTPAGEPDX'
-	    ,'DAILYSALESPRODUCTPAGE')
-	AND a.VisitHasLibraAction = 1
+  AND a.TestID IN {{ testFilter }}
+  AND b.PlatformID IN {{platformFilter}}
+  AND a.Event_SoID IN {{soidFilter}}
+  AND b.DeviceTypeID IN {{deviceFilter}}
+  AND a.ModalClick = 0 --Do not need individual eventTypes
+  AND a.Event_Pagetype IN (
+    'PRODUCTSIMPLESKU'
+    ,'PRODUCTSIMPLESKUPDX'
+    ,'PRODUCTOPTIONSKU'
+    ,'PRODUCTOPTIONSKUPDX'
+    ,'PRODUCTKIT'
+    ,'PRODUCTKITPDX'
+    ,'SALECLEARANCEPRODUCTPAGE'
+    ,'SALECLEARANCEPRODUCTPAGEPDX'
+    ,'DAILYSALESPRODUCTPAGE')
+  AND a.VisitHasLibraAction = 1
 GROUP BY 1,2,3,4,5,6
 ORDER BY 1,2,3,4
 Encoded BY
-	SessionStartDate ENCODING RLE,
-	Event_SoID ENCODING RLE
+  SessionStartDate ENCODING RLE,
+  Event_SoID ENCODING RLE
 SEGMENTED BY 
-	hash(Event_SessionKey) ALL NODES
+  hash(Event_SessionKey) ALL NODES
 ;
 SELECT ANALYZE_STATISTICS('tmpSessionSet');
-
 
 /* MATCHBACK BREAKPOINT IDENTIFICATION */--------------------------------------------------------------------------------
 -- Keeps stores independent of one another

@@ -38,7 +38,10 @@ export default function App() {
     .post(`http://localhost:3001/api/renderfile`, requestBody)
     .then(response => {
       setScript1(response.data);
-    });
+    })
+    .catch(err => {
+      console.log(`Error, renderfile API call: `, err);
+    })
   };
 
   function updateStateArray(e, state, setStateFunc) {

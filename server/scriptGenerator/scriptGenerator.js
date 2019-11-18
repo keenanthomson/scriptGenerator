@@ -1,12 +1,12 @@
-const writeVariables = require('./writeVariables.js');
+const writeVariableData = require('./writeVariables.js');
 const writeMbScript = require('./writeMbScript.js');
 
 function scriptGenerator(data, cb) {
 
-    writeVariables(data)
-    writeMbScript(() => {
-      cb();
-    });
+  writeVariableData(data)
+  writeMbScript(() => {
+    cb();
+  });
 
 };
 
