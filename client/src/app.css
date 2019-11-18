@@ -21,7 +21,7 @@
   margin: 10px 0 0 0;
 }
 
-.entries {
+.entries-primary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 2fr 2fr 2fr 2fr 2fr 7.25fr;
@@ -29,6 +29,20 @@
   border-radius: 0 0 5px 5px;
   border: 1px solid #dfe2e5;
   padding: 10px;
+}
+
+.entries-secondary {
+  background-color:  #eff3f6;
+  border-radius: 0 0 5px 5px;
+  border: 1px solid #dfe2e5;
+  padding: 10px;
+}
+
+.entries-secondary-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 2fr;
+  margin: 0 50% 0 0;
 }
 
 .entry-input {

@@ -80,7 +80,7 @@ export default function App() {
         <div className="entries-header">
           PRIMARY KPIS SCRIPT
         </div>
-        <div className="entries">
+        <div className="entries-primary">
         <div className="input-name"><span>Analyst Initials</span></div>
           <div className="input-name"><span>Test Name</span></div>
           <div></div>
@@ -133,8 +133,10 @@ export default function App() {
         <div className="entries-header">
           TRACKING SCRIPT
         </div>
-        <div>
-
+        <div className="entries-secondary">
+          <div className="entries-secondary-grid">
+            <input className="input-tracking"></input>
+          </div>
         </div>
         <div className='button-grid'>
           <input className="button" type="submit" onClick={() => renderScript()}></input>
