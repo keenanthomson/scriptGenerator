@@ -1,13 +1,8 @@
 settarget webvertica;
-meta SET SessDateFilter = (sessionstartDate between '2019-10-31' and '2019-11-07');
-meta SET testFilter = (1234);
-meta SET platformFilter = (1);
-meta SET storeFilter = (446);
-meta SET deviceFilter = (2);
-meta SET osFilter = (1,2);
+meta SET SessDateFilter = (sessionstartDate between '2019-10-31' and '2019-11-13');
 meta SET matchbackDays = 14;
 meta SET tblMbOutcomes = csn_junk.tblMb14Day_noInitials_noTestName;
-meta SET tblSessOutcomes = csn_junk.tblSess_noInitials_nodata.TestName;
+meta SET tblSessOutcomes = csn_junk.tblSess_noInitials_noTestName;
 meta SET tblGRSVCD_store = csn_junk.tblGRSVCDstore_noInitials_noTestName;
 meta SET tblGRSVCD_storeXvisitor = csn_junk.tblGRSVCDstoreXvisitor_noInitials_noTestName;
 
@@ -24,7 +19,6 @@ SELECT
   ,a.ControlGroup AS isControlGroup
   ,a.CuID
   ,MIN(a.Event_Timestamp) AS MinTimeStamp
-  ,CASE WHEN a.CuID = b.CuID THEN 1 ELSE 0 END AS excludeCustomer
 FROM csn_clickstream.tblDashClicks_Libra AS a
 INNER JOIN csn_warp.tblPDP_ProductView AS b
   ON a.SessionStartDate = b.SessionStartDate
@@ -32,10 +26,6 @@ INNER JOIN csn_warp.tblPDP_ProductView AS b
   AND a.Event_SessionKey = b.Event_SessionKey
   AND a.Event_PrSKU = b.Event_PrSKU
 WHERE {{SessDateFilter}}
-  AND a.TestID IN {{ testFilter }}
-  AND b.PlatformID IN {{platformFilter}}
-  AND a.Event_SoID IN {{soidFilter}}
-  AND b.DeviceTypeID IN {{deviceFilter}}
   AND a.ModalClick = 0 --Do not need individual eventTypes
   AND a.Event_Pagetype IN (
     'PRODUCTSIMPLESKU'

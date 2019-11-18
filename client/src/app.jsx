@@ -64,7 +64,7 @@ export default function App() {
 
   function MbScriptButton() {
     if (script1) {
-      return <input className="button" type="button" value="Copy Script" onClick={() => copyScript1()}></input>
+      return <input className="button" type="button" value="Copy" onClick={() => copyScript1()}></input>
     };
   };
 
@@ -77,6 +77,9 @@ export default function App() {
     return(
       <div className="box">
         <div className="header">SQL Script Generator<br/><br/>PDP Customer- and Session-level Test KPIs</div>
+        <div className="entries-header">
+          PRIMARY KPIS SCRIPT
+        </div>
         <div className="entries">
         <div className="input-name"><span>Analyst Initials</span></div>
           <div className="input-name"><span>Test Name</span></div>
@@ -126,6 +129,12 @@ export default function App() {
             <input type="checkbox" value="5"/> iOS<br/>
             <input type="checkbox" value="6"/> Android
           </div>
+        </div>
+        <div className="entries-header">
+          TRACKING SCRIPT
+        </div>
+        <div>
+
         </div>
         <div className='button-grid'>
           <input className="button" type="submit" onClick={() => renderScript()}></input>

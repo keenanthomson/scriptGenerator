@@ -13,7 +13,7 @@ function writeVariableData(data) {
   if (data.OS.length > 0) script = script + `\nmeta SET osFilter = (${data.OS});`;
   script = script + `\nmeta SET matchbackDays = 14;`;
   script = script + `\nmeta SET tblMbOutcomes = csn_junk.tblMb14Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
-  script = script + `\nmeta SET tblSessOutcomes = csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'nodata.TestName'};`;
+  script = script + `\nmeta SET tblSessOutcomes = csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
   script = script + `\nmeta SET tblGRSVCD_store = csn_junk.tblGRSVCDstore_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
   script = script + `\nmeta SET tblGRSVCD_storeXvisitor = csn_junk.tblGRSVCDstoreXvisitor_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
   script = script + `\n\nBEGIN;\n\n`;
@@ -28,7 +28,6 @@ SELECT
   ,a.ControlGroup AS isControlGroup
   ,a.CuID
   ,MIN(a.Event_Timestamp) AS MinTimeStamp
-  ,CASE WHEN a.CuID = b.CuID THEN 1 ELSE 0 END AS excludeCustomer
 FROM csn_clickstream.tblDashClicks_Libra AS a
 INNER JOIN csn_warp.tblPDP_ProductView AS b
   ON a.SessionStartDate = b.SessionStartDate

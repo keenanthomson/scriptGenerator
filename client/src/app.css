@@ -12,12 +12,21 @@
   margin: 10px 0 30px 6px;
 }
 
+.entries-header {
+  background-color:  #eff3f6;
+  border-radius: 5px 5px 0 0;
+  border: 1px solid #dfe2e5;
+  border-bottom: 1px solid black;
+  padding: 10px;
+  margin: 10px 0 0 0;
+}
+
 .entries {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 2fr 2fr 2fr 2fr 2fr 7.25fr;
   background-color:  #eff3f6;
-  border-radius: 5px;
+  border-radius: 0 0 5px 5px;
   border: 1px solid #dfe2e5;
   padding: 10px;
 }
@@ -72,4 +81,3 @@
 pre {
   font-size: 14px;
 }
-
