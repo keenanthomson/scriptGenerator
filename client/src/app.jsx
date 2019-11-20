@@ -14,6 +14,12 @@ export default function App() {
   const [Devices, setDevices] = useState([]);
   const [Stores, setStores] = useState([]);
   const [OS, setOS] = useState([]);
+  const [ClickLocationInput, setClickLocationInput] = useState(null);
+  const [ClickLocation, setClickLocation] = useState([]);
+  const [WebActionInput, setWebActionInput] = useState(null);
+  const [WebAction, setWebAction] = useState([]);
+  const [InViewInput, setInViewInput] = useState(null);
+  const [InView, setInView] = useState([]);
   const [script1, setScript1] = useState(null);
   const [script2, setScript2] = useState(null);
 
@@ -56,6 +62,16 @@ export default function App() {
     };
   };
 
+  function updateTrackingState(e, state, setState, setStateInput) {
+    if (state.includes(e)) {
+      alert(`Tracking already recorded.`);
+    } else {
+      state.push(e);
+      setState(state);
+      setStateInput("");
+    };
+  };
+
   function MbScriptPreview() {
     if (script1) {
       return <pre>{script1}</pre>
@@ -76,7 +92,7 @@ export default function App() {
 
     return(
       <div className="box">
-        <div className="header">SQL Script Generator<br/><br/>PDP Customer- and Session-level Test KPIs</div>
+        <div className="header">SQL Script Generator</div>
         <div className="entries-header">
           PRIMARY KPIS SCRIPT
         </div>
@@ -135,11 +151,24 @@ export default function App() {
         </div>
         <div className="entries-secondary">
           <div className="entries-secondary-grid">
-            <input className="input-tracking"></input>
+            <span>ClickLocation</span>
+            <input className="input-tracking" value={ClickLocationInput} onChange={(e) => setClickLocationInput(e.target.value)}></input>
+            <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(ClickLocationInput, ClickLocation, setClickLocation, setClickLocationInput)}></input>
+          </div>
+          <div>{ClickLocation}</div>
+          <div className="entries-secondary-grid">
+            <span>WebAction</span>
+            <input className="input-tracking" onChange={(e) => setWebActionInput(e.target.value)}></input>
+            <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(WebActionInput, WebAction, setWebAction, setWebActionInput)}></input>
+          </div>
+          <div className="entries-secondary-grid">
+            <span>InView</span>
+            <input className="input-tracking" onChange={(e) => setInViewInput(e.target.value)}></input>
+            <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(InViewInput, InView, setInView, setInViewInput)}></input>
           </div>
         </div>
         <div className='button-grid'>
-          <input className="button" type="submit" onClick={() => renderScript()}></input>
+          <input className="button button-submit" type="submit" onClick={() => renderScript()}></input>
           {MbScriptButton()}
         </div>
         <div>

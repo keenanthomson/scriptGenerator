@@ -35,14 +35,14 @@
   background-color:  #eff3f6;
   border-radius: 0 0 5px 5px;
   border: 1px solid #dfe2e5;
-  padding: 10px;
+  /* padding: 0 80px 0 10px; */
 }
 
 .entries-secondary-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 4fr 0.5fr;
   grid-template-rows: 2fr;
-  margin: 0 50% 0 0;
+  margin: 10px 20px 10px 20px;
 }
 
 .entry-input {
@@ -76,11 +76,17 @@
 
 .button {
   font-size: 16px;
-  margin: 15px 0 0 0;
   border-radius: 5px;
   color: #24292e;
   background-color: #eff3f6;
-  margin: 0 10px 0 0;
+}
+
+.button-submit {
+  margin: 0 20px 0 0;
+}
+
+.button-tracking {
+  margin: 0 40px 0 0;
 }
 
 .checkbox-div {
@@ -94,4 +100,8 @@
 
 pre {
   font-size: 14px;
+}
+
+.input-tracking {
+  margin: 0 10px 0 10px;
 }
