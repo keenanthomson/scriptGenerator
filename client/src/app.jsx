@@ -14,11 +14,11 @@ export default function App() {
   const [Devices, setDevices] = useState([]);
   const [Stores, setStores] = useState([]);
   const [OS, setOS] = useState([]);
-  const [ClickLocationInput, setClickLocationInput] = useState(null);
+  const [ClickLocationInput, setClickLocationInput] = useState("");
   const [ClickLocation, setClickLocation] = useState([]);
-  const [WebActionInput, setWebActionInput] = useState(null);
+  const [WebActionInput, setWebActionInput] = useState("");
   const [WebAction, setWebAction] = useState([]);
-  const [InViewInput, setInViewInput] = useState(null);
+  const [InViewInput, setInViewInput] = useState("");
   const [InView, setInView] = useState([]);
   const [script1, setScript1] = useState(null);
   const [script2, setScript2] = useState(null);
@@ -38,16 +38,20 @@ export default function App() {
       devices: Devices,
       stores: Stores,
       OS: OS,
+      ClickLocation: ClickLocationInput,
+      WebAction: WebActionInput,
+      InView: InViewInput,
     };
 
     axios
-    .post(`http://localhost:3001/api/renderfile`, requestBody)
+    .post(`http://localhost:3001/api/renderscript1`, requestBody)
     .then(response => {
       setScript1(response.data);
     })
     .catch(err => {
       console.log(`Error, renderfile API call: `, err);
     })
+    .then(console.log(`RENDER SCRIPTS COMPLETE`));
   };
 
   function updateStateArray(e, state, setStateFunc) {
@@ -62,15 +66,15 @@ export default function App() {
     };
   };
 
-  function updateTrackingState(e, state, setState, setStateInput) {
-    if (state.includes(e)) {
-      alert(`Tracking already recorded.`);
-    } else {
-      state.push(e);
-      setState(state);
-      setStateInput("");
-    };
-  };
+  // function updateTrackingState(e, state, setState, setStateInput) {
+  //   if (state.includes(e)) {
+  //     alert(`Tracking Already Saved.`);
+  //   } else {
+  //     state.push(e);
+  //     setState(state);
+  //     setStateInput("");
+  //   };
+  // };
 
   function MbScriptPreview() {
     if (script1) {
@@ -147,24 +151,23 @@ export default function App() {
           </div>
         </div>
         <div className="entries-header">
-          TRACKING SCRIPT
+          TRACKING SCRIPT <i>(comma separated, no spaces)</i>
         </div>
         <div className="entries-secondary">
           <div className="entries-secondary-grid">
             <span>ClickLocation</span>
-            <input className="input-tracking" value={ClickLocationInput} onChange={(e) => setClickLocationInput(e.target.value)}></input>
-            <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(ClickLocationInput, ClickLocation, setClickLocation, setClickLocationInput)}></input>
+            <input className="input-tracking" value={ClickLocationInput} onChange={(e) => setClickLocationInput((e.target.value).toUpperCase())}></input>
+            {/* <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(ClickLocationInput, ClickLocation, setClickLocation, setClickLocationInput)}></input> */}
           </div>
-          <div>{ClickLocation}</div>
           <div className="entries-secondary-grid">
             <span>WebAction</span>
-            <input className="input-tracking" onChange={(e) => setWebActionInput(e.target.value)}></input>
-            <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(WebActionInput, WebAction, setWebAction, setWebActionInput)}></input>
+            <input className="input-tracking" value={WebActionInput} onChange={(e) => setWebActionInput((e.target.value).toUpperCase())}></input>
+            {/* <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(WebActionInput, WebAction, setWebAction, setWebActionInput)}></input> */}
           </div>
           <div className="entries-secondary-grid">
             <span>InView</span>
-            <input className="input-tracking" onChange={(e) => setInViewInput(e.target.value)}></input>
-            <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(InViewInput, InView, setInView, setInViewInput)}></input>
+            <input className="input-tracking" value={InViewInput} onChange={(e) => setInViewInput((e.target.value).toUpperCase())}></input>
+            {/* <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(InViewInput, InView, setInView, setInViewInput)}></input> */}
           </div>
         </div>
         <div className='button-grid'>

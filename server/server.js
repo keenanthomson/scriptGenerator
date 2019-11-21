@@ -4,14 +4,14 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const port = 3001;
-const scriptGenerator = require('./scriptGenerator/scriptGenerator.js');
+const scriptGenerator = require('./scriptGenerator/kpiScriptGenerator.js');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(express.static('./client/dist'));
 
-app.post('/api/renderfile', (req, res) => {
+app.post('/api/renderscript1', (req, res) => {
   scriptGenerator(req.body, () => {
     fs.readFile(path.join(__dirname, '/scriptGenerator/testing.sql'), (err, data) => {
       if (err) {
@@ -21,6 +21,10 @@ app.post('/api/renderfile', (req, res) => {
       };
     });
   });
+});
+
+app.post('/api/renderscript2', (req, res) => {
+
 });
 
 app.listen(port, () => {
