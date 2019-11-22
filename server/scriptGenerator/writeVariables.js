@@ -1,24 +1,10 @@
 const path = require('path');
 const fs = require('fs');
 
-function writeVariableData(data) {
+function writeScript1(data, cb) {
   let startDate = formatDate(data.startDate);
   let endDate = formatDate(data.endDate);
-  // let script = `settarget webvertica;`
-  // script = script + `\nmeta SET SessDateFilter = (sessionstartDate between '${startDate}' and '${endDate}');`
-  // if (data.testID) script = script + `\nmeta SET testFilter = (${data.testID});`;
-  // if (data.platforms.length > 0) script = script + `\nmeta SET platformFilter = (${data.platforms});`;
-  // if (data.stores.length > 0) script = script + `\nmeta SET storeFilter = (${data.stores});`
-  // if (data.devices.length > 0) script = script + `\nmeta SET deviceFilter = (${data.devices});`;
-  // if (data.OS.length > 0) script = script + `\nmeta SET osFilter = (${data.OS});`;
-  // script = script + `\nmeta SET matchbackDays = 14;`;
-  script = script + `\nmeta SET tblMbOutcomes = csn_junk.tblMb14Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
-  script = script + `\nmeta SET tblSessOutcomes = csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
-  // script = script + `\nmeta SET tblGRSVCD_store = csn_junk.tblGRSVCDstore_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
-  // script = script + `\nmeta SET tblGRSVCD_storeXvisitor = csn_junk.tblGRSVCDstoreXvisitor_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};`;
-  // script = script + `\n\nBEGIN;\n\n`;
-  let script = script + `
-DROP TABLE IF EXISTS tmpSessionSet; 
+  let script = `DROP TABLE IF EXISTS tmpSessionSet; 
 CREATE LOCAL TEMPORARY TABLE tmpSessionSet ON COMMIT PRESERVE ROWS AS /*+ direct */
 SELECT
     a.SessionStartDate
@@ -34,7 +20,7 @@ INNER JOIN csn_warp.tblPDP_ProductView AS b --Join to PDP table for ID inclusion
   AND a.Event_SoID = b.Event_SoID
   AND a.Event_SessionKey = b.Event_SessionKey
   AND a.Event_PrSKU = b.Event_PrSKU
-WHERE ${renderConditionals()}
+WHERE ${renderConditionals(data, startDate, endDate)}
   AND a.ModalClick = 0 --Do not need individual eventTypes
   AND a.Event_Pagetype IN (
 /* UPDATE PDP PAGES OF INTEREST HERE */
@@ -71,7 +57,7 @@ SELECT Event_SoID
   ,TestGroupName
   ,isControlGroup
   ,CASE WHEN SessionStartDate > 
-    ISNULL(LAG(SessionStartDate, 1, NULL) OVER (PARTITION BY Event_SoID, CuID ORDER BY MinTimeStamp ASC), SessionStartDate) + {{ matchbackDays }}
+    ISNULL(LAG(SessionStartDate, 1, NULL) OVER (PARTITION BY Event_SoID, CuID ORDER BY MinTimeStamp ASC), SessionStartDate) + 30
     THEN 0 END AS BreakPoint --Establishes independance by store
 FROM tmpSessionSet
 ORDER BY 1,2,3
@@ -187,7 +173,7 @@ SELECT a.Event_SoID
   ,MAX(CASE WHEN a.Event_SoID = b.Event_SoID THEN b.Converted ELSE 0 END) AS Mb_SameStoreCVR
 FROM tmpMatchbackRollup AS a
 INNER JOIN csn_clickstream.tblDashVisits_data AS b --Need to pull in complete list of sessions for each CuID to determine complete set of sessions
-  ON b.SessionStartDate BETWEEN a.MinSessionStartDate AND a.MaxSessionStartDate + {{ matchbackDays }}::INT -- Join table not constrained by test period
+  ON b.SessionStartDate BETWEEN a.MinSessionStartDate AND a.MaxSessionStartDate + 30::INT -- Join table not constrained by test period
   AND a.cuid = b.cuid
   --Exclude store condition to account for cross store conversions
 GROUP BY 1,2,3
@@ -209,7 +195,7 @@ SELECT a.Event_SoID
   ,b.OrID
 FROM tmpMatchbackRollup AS a
 INNER JOIN csn_clickstream.tblDashClicks_data AS b --Need to pull in complete list of OrIDs for each CuID to determine entire revenue impact
-  ON b.SessionStartDate BETWEEN a.MinSessionStartDate AND a.MaxSessionStartDate + {{ matchbackDays }}::INT -- Join table not constrained by test period
+  ON b.SessionStartDate BETWEEN a.MinSessionStartDate AND a.MaxSessionStartDate + 30::INT -- Join table not constrained by test period
   AND a.cuid = b.cuid
   AND b.OrID IS NOT NULL
   --Exclude store condition to account for cross store conversions
@@ -244,8 +230,8 @@ SEGMENTED BY
 SELECT ANALYZE_STATISTICS('tmpMbRevenue');
 
 -- Assign matchback acquisition characteristics --------------------------------------------
-DROP TABLE IF EXISTS {{ tblMbOutcomes }};
-CREATE TABLE {{ tblMbOutcomes }} AS /*+ direct */
+DROP TABLE IF EXISTS csn_junk.tblMb30Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};
+CREATE TABLE csn_junk.tblMb30Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'} AS /*+ direct */
 --explain
 SELECT a.MinSessionStartDate
   ,a.MaxSessionStartDate
@@ -279,13 +265,13 @@ Encoded BY
 SEGMENTED BY 
   hash(MbId) ALL NODES
 ;
-SELECT ANALYZE_STATISTICS('{{ tblMbOutcomes }}');
+SELECT ANALYZE_STATISTICS('csn_junk.tblMb30Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}');
 
 --------------------------------------------------------------------------------------------------------------
 /* SESSION LEVEL FACT TABLE */--------------------------------------------------------------------------------
 -- Matchback included here for secondary segment KPI calculation
-DROP TABLE IF EXISTS {{ tblSessOutcomes }};
-CREATE TABLE {{ tblSessOutcomes }} AS /*+ direct */
+DROP TABLE IF EXISTS csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'};
+CREATE TABLE csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'} AS /*+ direct */
 SELECT a.SessionStartDate
   ,a.Event_SoID
   ,a.Event_SessionKey
@@ -312,7 +298,7 @@ SELECT a.SessionStartDate
   ,b.Mb_SameStoreATC
   ,b.Mb_SameStoreCVR
 FROM tmpSessOutcomes AS a
-LEFT JOIN {{ tblMbOutcomes }} AS b -- Left join because we may drop sessions due to matchback exposure to multiple variations
+LEFT JOIN csn_junk.tblMb30Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'} AS b -- Left join because we may drop sessions due to matchback exposure to multiple variations
   ON a.SessionStartDate BETWEEN b.MinSessionStartDate AND b.MaxSessionStartDate 
   AND a.Event_SoID = b.Event_SoID
   AND a.MbId = b.MbId
@@ -323,7 +309,7 @@ Encoded BY
 SEGMENTED BY 
   hash(Event_SessionKey) ALL NODES
 ;
-SELECT ANALYZE_STATISTICS('{{ tblSessOutcomes }}')
+SELECT ANALYZE_STATISTICS('csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}')
 ;
 
 /* MATCHBACK & SESSION KPI AGGREGATION */--------------------------------------------------------------------------------
@@ -339,7 +325,7 @@ SELECT
   ,SUM(Mb_AnyStoreCVR) AS Converted
   ,SUM(MB_GrossRevenueStable) AS GrossRevenueStable
   ,SUM(MB_VariableContribution) AS VariableContribution
-FROM {{ tblMbOutcomes }}
+FROM csn_junk.tblMb30Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -352,7 +338,7 @@ SELECT
   ,COUNT(*) AS Cnt
   ,SUM(Mb_SameStoreATC) AS AddedToCart
   ,SUM(Mb_SameStoreCVR) AS Converted
-FROM {{ tblMbOutcomes }}
+FROM csn_junk.tblMb30Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -367,7 +353,7 @@ SELECT
   ,SUM(Mb_AnyStoreCVR) AS Converted -- May want to make this same store since visitor type is defined at the store level
   ,SUM(MB_GrossRevenueStable) AS GrossRevenueStable
   ,SUM(MB_VariableContribution) AS VariableContribution
-FROM {{ tblMbOutcomes }}
+FROM csn_junk.tblMb30Day_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -380,7 +366,7 @@ SELECT
   ,COUNT(DISTINCT MbID) AS Cnt
   ,COUNT(DISTINCT CASE WHEN Mb_AnyStoreATC = 1 THEN MbID ELSE NULL END) AS AddedToCart
   ,COUNT(DISTINCT CASE WHEN Mb_AnyStoreCVR = 1 THEN MbID ELSE NULL END) AS Converted
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 WHERE MbID IS NOT NULL -- Not all sessions are assigned an MbID
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
@@ -398,7 +384,7 @@ SELECT
   ,SUM(ProductPlacedOrder) AS PlacedOrder
   ,SUM(PDPExit) AS PDPExit
   ,SUM(GrossRevenueStable) AS GrossRevenueStable
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -414,7 +400,7 @@ SELECT
   ,SUM(ProductPlacedOrder) AS PlacedOrder
   ,SUM(PDPExit) AS PDPExit
   ,SUM(GrossRevenueStable) AS GrossRevenueStable
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -430,7 +416,7 @@ SELECT
   ,SUM(ProductPlacedOrder) AS PlacedOrder
   ,SUM(PDPExit) AS PDPExit
   ,SUM(GrossRevenueStable) AS GrossRevenueStable
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -446,7 +432,7 @@ SELECT
   ,SUM(ProductPlacedOrder) AS PlacedOrder
   ,SUM(PDPExit) AS PDPExit
   ,SUM(GrossRevenueStable) AS GrossRevenueStable
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -462,7 +448,7 @@ SELECT
   ,SUM(ProductPlacedOrder) AS PlacedOrder
   ,SUM(PDPExit) AS PDPExit
   ,SUM(GrossRevenueStable) AS GrossRevenueStable
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -479,7 +465,7 @@ SELECT
   ,SUM(ProductPlacedOrder) AS PlacedOrder
   ,SUM(PDPExit) AS PDPExit
   ,SUM(GrossRevenueStable) AS GrossRevenueStable
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -496,7 +482,7 @@ SELECT
   ,SUM(ProductPlacedOrder) AS PlacedOrder
   ,SUM(PDPExit) AS PDPExit
   ,SUM(GrossRevenueStable) AS GrossRevenueStable
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -512,7 +498,7 @@ SELECT
   ,SUM(ProductPlacedOrder) AS PlacedOrder
   ,SUM(PDPExit) AS PDPExit
   ,SUM(GrossRevenueStable) AS GrossRevenueStable
-FROM {{ tblSessOutcomes }}
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'}
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
@@ -535,7 +521,7 @@ SELECT
   ,b.ProductPlacedOrder
   ,b.PDPExit
   ,NVL(b.GrossRevenueStable, 0)::FLOAT AS GrossRevenueStable
-FROM {{ tblSessOutcomes }} AS a
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'} AS a
 INNER JOIN csn_warp.tblPDP_ProductView AS b -------------------should this remove QuickView Only????
   ON a.SessionStartDate = b.SessionStartDate
   AND a.event_soid = b.event_soid
@@ -668,7 +654,7 @@ SELECT
   ,b.PlatformID
   ,c.PageTypeGroup
   ,MAX(b.Exit) AS Exit
-FROM {{ tblSessOutcomes }} AS a
+FROM csn_junk.tblSess_${data.initials || 'noInitials'}_${data.testName || 'noTestName'} AS a
 INNER JOIN csn_clickstream.tblDashClicks_Data AS b
   ON a.SessionStartDate = b.SessionStartDate
   AND a.event_soid = b.event_soid
@@ -702,7 +688,9 @@ ORDER BY 1,2,3,4
   fs.writeFile(path.join(__dirname, '/testing.sql'), script, err => {
     if (err) {
       console.log(`Error writing script variables: `, err);
-    }
+    } else {
+      cb();
+    };
   });
 };
 
@@ -713,19 +701,19 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 };
 
-function renderConditionals(data) {
-  let script = `SessionStartDate between ${startDate} and ${endDate}`;
+function renderConditionals(data, startDate, endDate) {
+  let script = `a.SessionStartDate between '${startDate}' and '${endDate}'`;
   if (data.testID) script = script + `\n  AND a.TestID = ${data.testID}`;
-  if (data.platforms.length > 1) {
-    script = script + `\n  AND b.PlatformID IN (${data.platforms})`; 
-  } else if (data.platforms.length > 0) {
-    script = script + `\n  AND b.PlatformID = ${data.platforms}`; 
-  };
   if (data.stores.length > 1) {
     script = script + `\n  AND a.Event_SoID IN (${data.stores})`;
   } else if (data.stores.length > 0) {
     script = script + `\n  AND a.Event_SoID = ${data.stores}`;
   }
+  if (data.platforms.length > 1) {
+    script = script + `\n  AND b.PlatformID IN (${data.platforms})`; 
+  } else if (data.platforms.length > 0) {
+    script = script + `\n  AND b.PlatformID = ${data.platforms}`; 
+  };
   if (data.devices.length > 1) {
     script = script + `\n  AND b.DeviceTypeID IN (${data.devices})`;
   } else if (data.devices.length > 0) {
@@ -736,4 +724,4 @@ function renderConditionals(data) {
   return script;
 }
 
-module.exports = writeVariableData;
+module.exports = writeScript1;

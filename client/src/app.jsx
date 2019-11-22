@@ -44,14 +44,13 @@ export default function App() {
     };
 
     axios
-    .post(`http://localhost:3001/api/renderscript1`, requestBody)
+    .post(`http://localhost:3001/api/renderscripts`, requestBody)
     .then(response => {
-      setScript1(response.data);
+      setScript1(response.data.script1);
     })
     .catch(err => {
-      console.log(`Error, renderfile API call: `, err);
+      console.log(`Error with renderfile API call: `, err);
     })
-    .then(console.log(`RENDER SCRIPTS COMPLETE`));
   };
 
   function updateStateArray(e, state, setStateFunc) {
@@ -178,5 +177,5 @@ export default function App() {
           {MbScriptPreview()}
         </div>
       </div>
-    )
+    );
 };
