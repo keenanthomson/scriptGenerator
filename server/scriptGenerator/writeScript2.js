@@ -69,7 +69,7 @@ SELECT
   ,a.DeviceGuIDHash
   ,a.PageRequestTransactionID
 /* ADD CLICKLOCATION CONDITIONS YOU WANT TO ATTRIBUTE TO THE PRIOR PDP PAGE HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-${renderTracking(data.ClickLocation, 'clicklocation').join('')}
+${data.ClickLocation ? renderTracking(data.ClickLocation, 'clicklocation').join('') : '  --No relevant tracking submitted'}
 FROM tmpPageViewSet AS a
 INNER JOIN csn_clickstream.tblDashClicks_Data AS b
   ON a.SessionStartDate = b.SessionStartDate
@@ -96,21 +96,7 @@ SELECT
   ,a.Event_SessionKey
   ,a.Event_PrSKU
 /* ADD EVENTTYPE CONDITIONS YOU WANT TO ATTRIBUTE TO THE CURRENT PDP PAGE HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  ,MAX(CASE WHEN b.EventType LIKE 'STL_CTL_VIEW%' THEN 1 ELSE 0 END) AS fSTL_TryThisLookAtHomeClick -- click Try This Look at Home sku
-  ,MAX(CASE WHEN b.EventType = 'PDP_VIZCON_OPEN' THEN 1 ELSE 0 END) AS fVizconOpen
-  ,MAX(CASE WHEN b.EventType = 'INFORMATION_OPEN' THEN 1 ELSE 0 END) AS fDescriptionClick -- control
-  ,MAX(CASE WHEN b.EventType = 'PRODUCTDETAILS_BANNER' THEN 1 ELSE 0 END) AS fProductDetailsClick -- variation
-  ,MAX(CASE WHEN b.EventType LIKE 'VID-%' THEN 1 ELSE 0 END) AS fWaymoreVideoCLick
-  ,MAX(CASE WHEN b.EventType = 'PDP_WAYMORE_HIGHLIGHTS_BUTTON_CLICK' THEN 1 ELSE 0 END) AS fWaymoreMoreHighlightsClick
-  ,MAX(CASE WHEN b.EventType = 'WEIGHTS_AND_DIMENSIONS_OPEN' THEN 1 ELSE 0 END) AS fWeightsDimensionsClick
-  ,MAX(CASE WHEN b.EventType = 'REVIEWS_OPEN' THEN 1 ELSE 0 END) AS fReviewsClick
-  ,MAX(CASE WHEN b.EventType = 'SPECIFICATIONS_OPEN' THEN 1 ELSE 0 END) AS fSpecificationsClick
-  ,MAX(CASE WHEN b.EventType = 'STC_DRAWER_OPEN_PDP' THEN 1 ELSE 0 END) AS fShopThisCollectionClick -- click Shop This Collection carousel sku
-  ,MAX(CASE WHEN b.EventType = 'RI_AATC_DRAWER_OPEN_PDP' THEN 1 ELSE 0 END) AS fYouMightAlsoNeedClick -- click You Might Also Need carousel sku
-  ,MAX(CASE WHEN b.EventType = 'MORE_FROM_THIS_SHOP_OPEN_PDP' THEN 1 ELSE 0 END) AS fMoreFromThisShopClick -- click The ___ Shop carousel sku
-  ,MAX(CASE WHEN b.EventType = 'SHIPPING_OPEN' THEN 1 ELSE 0 END) AS fShippingClick
-  ,MAX(CASE WHEN b.EventType = 'PROTECTION_OPEN' THEN 1 ELSE 0 END) AS fProtectionClick
-  ,MAX(CASE WHEN b.EventType = 'QA_OPEN' THEN 1 ELSE 0 END) AS fQAClick
+${data.WebAction ? renderTracking(data.WebAction, 'eventtype').join(''): '  --No relevant tracking submitted'}
 FROM tmpPageViewSet AS a
 INNER JOIN csn_clickstream.tblDashClicks_Data AS b
   ON a.SessionStartDate = b.SessionStartDate
@@ -137,14 +123,8 @@ SELECT
   ,a.Event_SessionKey
   ,a.Event_PrSKU
   /* Consolidated Drawer Inview Events, in Same Descending Order as Actually in the Drawer */
-  ,MAX(CASE WHEN b.ClickLocation = 'ATAGLANCE_HEADER' THEN 1 ELSE 0 END) AS fAtaGlanceInView
-  ,MAX(CASE WHEN b.ClickLocation = 'WEIGHTSANDDIMENSIONS_HEADER' THEN 1 ELSE 0 END) AS fWeightDimensionsInView
-  ,MAX(CASE WHEN b.ClickLocation = 'DESCRIPTION_HEADER' THEN 1 ELSE 0 END) AS fDescriptionInview
-  ,MAX(CASE WHEN b.ClickLocation = 'SPECIFICATIONS_HEADER' THEN 1 ELSE 0 END) AS fSpecInview
-  ,MAX(CASE WHEN b.ClickLocation = 'WAYMORE_HEADER' THEN 1 ELSE 0 END) AS fHighlightsInview
-  ,MAX(CASE WHEN b.ClickLocation LIKE 'WAYMOREMCB%' THEN 1 ELSE 0 END) AS fWaymoreMCBInview
-  ,MAX(CASE WHEN b.ClickLocation LIKE 'WAYMORE_CONTENTHELPFULNESS' THEN 1 ELSE 0 END) AS fWaymoreBottomInview
-from tmpPageViewSet a
+${data.InView ? renderTracking(data.InView, 'clicklocation').join('') : '  --No relevant tracking submitted'}
+FROM tmpPageViewSet a
 LEFT JOIN csn_scribedash.tblScribeInView AS b
   ON b.EventDate between a.SessionStartDate and a.SessionStartDate + 1
   AND a.event_soid = b.StoreID
