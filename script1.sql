@@ -14,7 +14,7 @@ INNER JOIN csn_warp.tblPDP_ProductView AS b --Join to PDP table for ID inclusion
   AND a.Event_SoID = b.Event_SoID
   AND a.Event_SessionKey = b.Event_SessionKey
   AND a.Event_PrSKU = b.Event_PrSKU
-WHERE a.SessionStartDate between '2019-11-01' and '2019-11-15'
+WHERE a.SessionStartDate between '2019-11-08' and '2019-11-21'
   AND a.ModalClick = 0 --Do not need individual eventTypes
   AND a.Event_Pagetype IN (
 /* UPDATE PDP PAGES OF INTEREST HERE */
