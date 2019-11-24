@@ -1,6 +1,3 @@
-const path = require('path');
-const fs = require('fs');
-
 function writeScript1(data) {
   return new Promise((resolve, reject) => {
     let startDate = formatDate(data.startDate);
@@ -685,14 +682,15 @@ GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
 `
-    fs.writeFile(path.join(__dirname, '/script1.sql'), script, err => {
-      if (err) {
-        console.log(`Error writing script variables: `, err);
-      } else {
-        console.log(`SUCCESS!`)
-        resolve();
-      };
-    });
+  resolve(script);
+
+    // fs.writeFile(path.join(__dirname, '/script1.sql'), script, err => {
+    //   if (err) {
+    //     console.log(`Error writing script variables: `, err);
+    //   } else {
+    //     resolve();
+    //   };
+    // });
   });
 };
 

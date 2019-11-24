@@ -1,9 +1,5 @@
-function writeScrip2(data) {
-  let ClickLocation;
+function writeScript2(data) {
   return new Promise((resolve, reject) => {
-    // if (data.ClickLocation ? let ClickLocation = data.ClickLocation.split(" ") : null
-    // if (data.WebAction) let WebAction = data.WebAction.split(" ");
-    // if (data.InView) let InView = data.Inview.split(" ");
     let script = `/* Page View Set */----------------------------------------------------------------------------------
 DROP TABLE IF EXISTS tmpPageViewSet; 
 CREATE LOCAL TEMPORARY TABLE tmpPageViewSet ON COMMIT PRESERVE ROWS AS /*+ direct */
@@ -73,21 +69,7 @@ SELECT
   ,a.DeviceGuIDHash
   ,a.PageRequestTransactionID
 /* ADD CLICKLOCATION CONDITIONS YOU WANT TO ATTRIBUTE TO THE PRIOR PDP PAGE HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-${() => {
-  if (data.ClickLocation) {
-    data.ClickLocation.split(",").forEach(elem => {
-      if (elem.includes('%')) {
-        return `MAX(CASE WHEN b.clickLocation LIKE '${elem}' THEN 1 ELSE 0 END) AS f${elem.toLowerCase()}`;
-      } else {
-        return `MAX CASE WHEN b.clicklocation = '${elem}' THEN 1 ELSE 0 END) AS f${elem.toLowerCase()}`;
-      };
-    });
-  };
-}}
-,MAX(CASE WHEN b.clicklocation LIKE 'FROM_COMPARE_CAROUSEL%' THEN 1 ELSE 0 END) AS fCompareCarouselClick -- click CSI carousel sku
-  ,MAX(CASE WHEN b.clicklocation LIKE 'STL%' THEN 1 ELSE 0 END) AS fSTL_RoomsWithThisItemClick -- click Rooms With This Item carousel sku
-  ,MAX(CASE WHEN b.clicklocation LIKE 'BEST_SELLERS_CAROUSEL_PRODUCT%' THEN 1 ELSE 0 END) AS fCAVCarouselCLick -- click CAV carousel sku
-  ,MAX(CASE WHEN b.clicklocation LIKE 'BLOOMREACH_%' THEN 1 ELSE 0 END) AS fRelatedProductClick -- click Related Products
+${renderTracking(data.ClickLocation, 'clicklocation').join('')}
 FROM tmpPageViewSet AS a
 INNER JOIN csn_clickstream.tblDashClicks_Data AS b
   ON a.SessionStartDate = b.SessionStartDate
@@ -596,8 +578,22 @@ GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;    
 `
-    resolve();
+  resolve(script);
   });
 };
 
-module.exports = writeScrip2;
+function renderTracking(trackingData, column) {
+  if (trackingData) {
+    let arr = trackingData.split(",").map(elem => {
+      if (elem.includes('%'))
+        return `,MAX(CASE WHEN b.${column} LIKE '${elem}' THEN 1 ELSE 0 END) AS f${elem.toLowerCase()}\n`;
+      else
+        return `,MAX CASE WHEN b.${column} = '${elem}' THEN 1 ELSE 0 END) AS f${elem.toLowerCase()}\n`;
+    });
+    let newElem = arr.pop().replace('\n', '');
+    arr.push(newElem);
+    return arr;
+  };
+};
+
+module.exports = writeScript2;

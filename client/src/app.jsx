@@ -46,7 +46,7 @@ export default function App() {
     axios
     .post(`http://localhost:3001/api/renderscripts`, requestBody)
     .then(response => {
-      console.log(response.data);
+      console.log(`RESPONSE -> `, response.data.script2);
       setScript1(response.data.script1);
     })
     .catch(err => {
