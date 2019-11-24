@@ -2,9 +2,10 @@ const path = require('path');
 const fs = require('fs');
 
 function writeScript1(data, cb) {
-  let startDate = formatDate(data.startDate);
-  let endDate = formatDate(data.endDate);
-  let script = `DROP TABLE IF EXISTS tmpSessionSet; 
+  return new Promise((resolve, reject) => {
+    let startDate = formatDate(data.startDate);
+    let endDate = formatDate(data.endDate);
+    let script = `DROP TABLE IF EXISTS tmpSessionSet; 
 CREATE LOCAL TEMPORARY TABLE tmpSessionSet ON COMMIT PRESERVE ROWS AS /*+ direct */
 SELECT
     a.SessionStartDate
@@ -684,13 +685,14 @@ GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
 `
-
-  fs.writeFile(path.join(__dirname, '/testing.sql'), script, err => {
-    if (err) {
-      console.log(`Error writing script variables: `, err);
-    } else {
-      cb();
-    };
+  
+    fs.writeFile(path.join(__dirname, '/testing.sql'), script, err => {
+      if (err) {
+        console.log(`Error writing script variables: `, err);
+      } else {
+        resolve();
+      };
+    });
   });
 };
 
@@ -719,7 +721,6 @@ function renderConditionals(data, startDate, endDate) {
   } else if (data.devices.length > 0) {
     script = script + `\n  AND b.DeviceTypeID = ${data.devices}`;
   }
-  
   // if (data.OS.length > 0) script = script + `\n  AND **PENDING**`
   return script;
 }

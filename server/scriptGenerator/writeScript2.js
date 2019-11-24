@@ -1,5 +1,5 @@
-function trackingScriptGenerator(data) {
-
+function writeScrip2(data) {
+  
 }
 
 module.exports = trackingScriptGenerator;
