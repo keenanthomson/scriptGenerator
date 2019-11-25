@@ -122,7 +122,7 @@ SELECT
   ,a.Event_SoID
   ,a.Event_SessionKey
   ,a.Event_PrSKU
-  /* Consolidated Drawer Inview Events, in Same Descending Order as Actually in the Drawer */
+  /* INVIEW EVENTS */
 ${data.InView ? renderTracking(data.InView, 'clicklocation').join('') : '  --No relevant tracking submitted'}
 FROM tmpPageViewSet a
 LEFT JOIN csn_scribedash.tblScribeInView AS b
@@ -203,34 +203,9 @@ SELECT
   ,pv.PlatformID
   ,pv.VisitorTypeID
 /* CUSTOM TEST FLAGS HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  ,cl.fCompareCarouselClick
-  ,cl.fCAVCarouselCLick
-  ,cl.fSTL_RoomsWithThisItemClick
-  ,cl.fRelatedProductClick
-  /* webclicks above, webactions below */
-  ,et.fSTL_TryThisLookAtHomeClick
-  ,et.fVizconOpen
-  ,et.fDescriptionClick -- control
-  ,et.fProductDetailsClick -- variation
-  ,et.fWaymoreVideoCLick
-  ,et.fWaymoreMoreHighlightsClick
-  ,et.fWeightsDimensionsClick
-  ,et.fShippingClick
-  ,et.fProtectionClick
-  ,et.fQAClick
-  ,et.fReviewsClick
-  ,et.fSpecificationsClick
-  ,et.fShopThisCollectionClick
-  ,et.fYouMightAlsoNeedClick
-  ,et.fMoreFromThisShopClick
-  /* Consolidated Drawer Inview Events */
-  ,iv.fAtaGlanceInView
-  ,iv.fWeightDimensionsInView
-  ,iv.fDescriptionInview
-  ,iv.fSpecInview
-  ,iv.fHighlightsInview
-  ,iv.fWaymoreMCBInview
-  ,iv.fWaymoreBottomInview
+${data.ClickLocation ? renderPVFlags(data.ClickLocation, 'cl').join('') : '-- No relevant tracking submitted'}
+${data.WebAction ? renderPVFlags(data.WebAction, 'et').join('') : '-- No relevant tracking submitted'}
+${data.InView ? renderPVFlags(data.InView, 'iv').join('') : '-- No relevant tracking submitted'}
   /* catch all flags indicating (1) if any banner in product description section was clicked or (2) any feature below PD was clicked */
   ,CASE WHEN (et.fDescriptionClick = 1
         OR et.fProductDetailsClick = 1
@@ -563,17 +538,24 @@ ORDER BY 1,2,3,4
 };
 
 function renderTracking(trackingData, column) {
-  if (trackingData) {
     let arr = trackingData.split(",").map(elem => {
       if (elem.includes('%'))
-        return `,MAX(CASE WHEN b.${column} LIKE '${elem}' THEN 1 ELSE 0 END) AS f${elem.toLowerCase()}\n`;
+        return `  ,MAX(CASE WHEN b.${column} LIKE '${elem}' THEN 1 ELSE 0 END) AS f${elem.toLowerCase()}\n`;
       else
-        return `,MAX CASE WHEN b.${column} = '${elem}' THEN 1 ELSE 0 END) AS f${elem.toLowerCase()}\n`;
+        return `  ,MAX CASE WHEN b.${column} = '${elem}' THEN 1 ELSE 0 END) AS f${elem.toLowerCase()}\n`;
     });
-    let newElem = arr.pop().replace('\n', '');
-    arr.push(newElem);
+    let lastElem = arr.pop().replace('\n', '');
+    arr.push(lastElem);
     return arr;
-  };
+};
+
+function renderPVFlags(trackingData, prefix) {
+  let arr = trackingData.split(",").map(elem => {
+      return `  ,${prefix}.f${elem.toLowerCase()}\n`;
+  });
+  let lastElem = arr.pop().replace('\n', '');
+  arr.push(lastElem);
+  return arr;
 };
 
 module.exports = writeScript2;
