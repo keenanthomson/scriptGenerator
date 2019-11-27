@@ -15,13 +15,12 @@ export default function App() {
   const [Stores, setStores] = useState([]);
   const [OS, setOS] = useState([]);
   const [ClickLocationInput, setClickLocationInput] = useState("");
-  const [ClickLocation, setClickLocation] = useState([]);
   const [WebActionInput, setWebActionInput] = useState("");
-  const [WebAction, setWebAction] = useState([]);
   const [InViewInput, setInViewInput] = useState("");
-  const [InView, setInView] = useState([]);
   const [script1, setScript1] = useState(null);
   const [script2, setScript2] = useState(null);
+  const [ShowScript1, setShowScript1] = useState(false);
+  const [ShowScript2, setShowScript2] = useState(false);
 
   function renderScript () {
     if (!StartDate | !EndDate) {
@@ -46,8 +45,9 @@ export default function App() {
     axios
     .post(`http://localhost:3001/api/renderscripts`, requestBody)
     .then(response => {
-      console.log(`RESPONSE -> `, response.data.script2);
       setScript1(response.data.script1);
+      setShowScript1(true);
+      setScript2(response.data.script2);
     })
     .catch(err => {
       console.log(`Error with renderfile API call: `, err);
@@ -66,32 +66,69 @@ export default function App() {
     };
   };
 
-  // function updateTrackingState(e, state, setState, setStateInput) {
-  //   if (state.includes(e)) {
-  //     alert(`Tracking Already Saved.`);
-  //   } else {
-  //     state.push(e);
-  //     setState(state);
-  //     setStateInput("");
-  //   };
-  // };
-
-  function MbScriptPreview() {
-    if (script1) {
+  function ScriptPreview() {
+    if (script1 && ShowScript1) {
       return <pre>{script1}</pre>
+    } else if (script2 && ShowScript2) {
+      return <pre>{script2}</pre>
     };
   };
 
-  function MbScriptButton() {
-    if (script1) {
-      return <input className="button" type="button" value="Copy" onClick={() => copyScript1()}></input>
+  function CopyButton() {
+    if (ShowScript1) {
+      return <input className="button noSelect" type="button" value="Copy" onClick={() => copyScript(script1)}></input>
+    } else if (ShowScript2) {
+      return <input className="button noSelect" type="button" value="Copy" onClick={() => copyScript(script2)}></input>     
     };
   };
 
-  function copyScript1() {
-    navigator.clipboard.writeText(script1).then(() => {
+  function copyScript(scriptName) {
+    navigator.clipboard.writeText(scriptName).then(() => {
       alert(`Script copied to clipboard.`)
     });
+  };
+
+  function RenderScriptButtons() {
+    if (script1) {
+      return (
+        <div className='button-tabs'>
+        <div className='button-grid'>
+          {Script1Button()}
+          {Script2Button()}
+        </div>
+      </div>
+      )
+    }
+  }
+
+  function Script1Button() {
+    if (script1 && ShowScript1) {
+      return <input className="button-toggle-selected noSelect" type="button" value="KPI Script" onClick={() => toggleScript1()}></input>
+    } else if (script1) {
+      return <input className="button-toggle noSelect" type="button" value="KPI Script" onClick={() => toggleScript1()}></input>
+    };
+  };
+
+  function Script2Button() {
+    if (script2 && ShowScript2) {
+      return <input className="button-toggle-selected noSelect" type="button" value="Tracking Script" onClick={() => toggleScript2()}></input>
+    } else if (script2) {
+      return <input className="button-toggle noSelect" type="button" value="Tracking Script" onClick={() => toggleScript2()}></input>      
+    };
+  };
+
+  function toggleScript1() {
+    if (!ShowScript1) {
+      setShowScript2(false);
+      setShowScript1(true);
+    };
+  };
+
+  function toggleScript2() {
+    if (!ShowScript2) {
+      setShowScript1(false);
+      setShowScript2(true);
+    };
   };
 
     return(
@@ -157,25 +194,23 @@ export default function App() {
           <div className="entries-secondary-grid">
             <span>ClickLocation</span>
             <input className="input-tracking" value={ClickLocationInput} onChange={(e) => setClickLocationInput((e.target.value).toUpperCase())}></input>
-            {/* <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(ClickLocationInput, ClickLocation, setClickLocation, setClickLocationInput)}></input> */}
           </div>
           <div className="entries-secondary-grid">
             <span>WebAction</span>
             <input className="input-tracking" value={WebActionInput} onChange={(e) => setWebActionInput((e.target.value).toUpperCase())}></input>
-            {/* <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(WebActionInput, WebAction, setWebAction, setWebActionInput)}></input> */}
           </div>
           <div className="entries-secondary-grid">
             <span>InView</span>
             <input className="input-tracking" value={InViewInput} onChange={(e) => setInViewInput((e.target.value).toUpperCase())}></input>
-            {/* <input className="button button-tracking" type="button" value="Add" onClick={() => updateTrackingState(InViewInput, InView, setInView, setInViewInput)}></input> */}
           </div>
         </div>
         <div className='button-grid'>
-          <input className="button button-submit" type="submit" onClick={() => renderScript()}></input>
-          {MbScriptButton()}
+          <input className="button button-submit noSelect" type="submit" onClick={() => renderScript()}></input>
+          {CopyButton()}
         </div>
+        {RenderScriptButtons()}
         <div>
-          {MbScriptPreview()}
+          {ScriptPreview()}
         </div>
       </div>
     );

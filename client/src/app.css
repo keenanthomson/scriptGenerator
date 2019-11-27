@@ -66,6 +66,13 @@
   margin: auto;
 }
 
+.button {
+  font-size: 16px;
+  border-radius: 5px;
+  color: #24292e;
+  background-color: #eff3f6;
+}
+
 .button-grid {
   display: grid;
   grid-template-rows: 1fr;
@@ -73,11 +80,8 @@
   margin: 20px 80% 0 0;
 }
 
-.button {
-  font-size: 16px;
-  border-radius: 5px;
-  color: #24292e;
-  background-color: #eff3f6;
+.button-tabs {
+  border-bottom: 1px solid rgb(186, 186, 186);
 }
 
 .button-submit {
@@ -86,6 +90,25 @@
 
 .button-tracking {
   margin: 0 40px 0 0;
+}
+
+.button-toggle {
+  font-size: 16px;
+  border-radius: 5px 5px 0 0;
+  border-bottom: 0;
+  color: #24292e;
+}
+
+.button-toggle-selected {
+  font-size: 16px;
+  border-radius: 5px 5px 0 0;
+  border-bottom: 0;
+  color: #24292e;
+  background-color: #eff3f6;
+}
+
+.button-script2 {
+  margin: 0 0 0 15px;
 }
 
 .checkbox-div {
@@ -103,4 +126,14 @@ pre {
 
 .input-tracking {
   margin: 0 10px 0 10px;
+}
+
+.noSelect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline:0
 }

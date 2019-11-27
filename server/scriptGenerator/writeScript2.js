@@ -47,7 +47,6 @@ INNER JOIN csn_warp.tblPDP_ProductView AS b
   AND a.event_soid = b.event_soid
   AND a.event_sessionkey = b.event_sessionkey
   AND a.Event_PrSKU = b.Event_PrSKU
-WHERE hasWaymore = 1
 GROUP BY 1,2,3,4,5,6
 ORDER BY 1,2,3,4
 Encoded BY
@@ -69,7 +68,7 @@ SELECT
   ,a.DeviceGuIDHash
   ,a.PageRequestTransactionID
 /* ADD CLICKLOCATION CONDITIONS YOU WANT TO ATTRIBUTE TO THE PRIOR PDP PAGE HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-${data.ClickLocation ? renderTracking(data.ClickLocation, 'clicklocation').join('') : '  --No relevant tracking submitted'}
+${data.ClickLocation ? renderTracking(data.ClickLocation, 'clicklocation').join('') : '  --No ClickLocation tracking submitted'}
 FROM tmpPageViewSet AS a
 INNER JOIN csn_clickstream.tblDashClicks_Data AS b
   ON a.SessionStartDate = b.SessionStartDate
@@ -96,7 +95,7 @@ SELECT
   ,a.Event_SessionKey
   ,a.Event_PrSKU
 /* ADD EVENTTYPE CONDITIONS YOU WANT TO ATTRIBUTE TO THE CURRENT PDP PAGE HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-${data.WebAction ? renderTracking(data.WebAction, 'eventtype').join(''): '  --No relevant tracking submitted'}
+${data.WebAction ? renderTracking(data.WebAction, 'eventtype').join(''): '  --No WebAction tracking submitted'}
 FROM tmpPageViewSet AS a
 INNER JOIN csn_clickstream.tblDashClicks_Data AS b
   ON a.SessionStartDate = b.SessionStartDate
@@ -123,7 +122,7 @@ SELECT
   ,a.Event_SessionKey
   ,a.Event_PrSKU
   /* INVIEW EVENTS */
-${data.InView ? renderTracking(data.InView, 'clicklocation').join('') : '  --No relevant tracking submitted'}
+${data.InView ? renderTracking(data.InView, 'clicklocation').join('') : '  --No InView tracking submitted'}
 FROM tmpPageViewSet a
 LEFT JOIN csn_scribedash.tblScribeInView AS b
   ON b.EventDate between a.SessionStartDate and a.SessionStartDate + 1
@@ -203,34 +202,10 @@ SELECT
   ,pv.PlatformID
   ,pv.VisitorTypeID
 /* CUSTOM TEST FLAGS HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-${data.ClickLocation ? renderPVFlags(data.ClickLocation, 'cl').join('') : '-- No relevant tracking submitted'}
-${data.WebAction ? renderPVFlags(data.WebAction, 'et').join('') : '-- No relevant tracking submitted'}
-${data.InView ? renderPVFlags(data.InView, 'iv').join('') : '-- No relevant tracking submitted'}
-  /* catch all flags indicating (1) if any banner in product description section was clicked or (2) any feature below PD was clicked */
-  ,CASE WHEN (et.fDescriptionClick = 1
-        OR et.fProductDetailsClick = 1
-        OR et.fVizconOpen = 1
-        OR et.fSpecificationsClick = 1
-        OR et.fReviewsClick = 1
-        OR et.fWeightsDimensionsClick = 1
-        OR et.fShippingClick = 1
-        OR et.fProtectionClick = 1
-        OR et.fQAClick =1
-        ) THEN 1 ELSE 0 END EngagedProductDetails
-  ,CASE WHEN (et.fDescriptionClick = 1
-        OR et.fVizconOpen = 1
-        OR et.fWeightsDimensionsClick = 1
-        OR et.fSpecificationsClick = 1				
-        ) THEN 1 ELSE 0 END EngagedAnyConsolidatedDrawerinControl
-  ,CASE WHEN (cl.fCompareCarouselClick = 1
-        OR cl.fCAVCarouselCLick = 1
-        OR cl.fSTL_RoomsWithThisItemClick = 1
-        OR cl.fRelatedProductClick = 1
-        OR et.fSTL_TryThisLookAtHomeClick = 1
-        OR et.fShopThisCollectionClick = 1
-        OR et.fYouMightAlsoNeedClick = 1
-        OR et.fMoreFromThisShopClick = 1
-        ) THEN 1 ELSE 0 END EngagedBelowPDSection
+${data.ClickLocation ? renderPVFlags(data.ClickLocation, 'cl').join('') : '-- No InView tracking submitted'}
+${data.WebAction ? renderPVFlags(data.WebAction, 'et').join('') : '-- No WebAction tracking submitted'}
+${data.InView ? renderPVFlags(data.InView, 'iv').join('') : '-- No InView tracking submitted'}
+/* catch all flags indicating */
 /* OTHER PDP FLAGS HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ,pv.ProductAddToCart
   ,pv.ProductPlacedOrder
@@ -266,7 +241,6 @@ LEFT JOIN tmpInViewFlags AS iv
 -- 	AND a.Event_SoID = sb.Event_SoID
 -- 	AND a.Event_SessionKey = sb.Event_SessionKey
 -- 	AND a.Event_PrSKU = sb.Event_PrSKU	
-where pv.hasWaymore = 1 -- Waymore SKUs only
 ORDER BY 1,2,3,4
 Encoded BY
   SessionStartDate ENCODING RLE,
@@ -280,7 +254,7 @@ SELECT ANALYZE_STATISTICS('tmpProductViewBehavior');
 DROP TABLE IF EXISTS tmpSessionBehavior; 
 CREATE LOCAL TEMPORARY TABLE tmpSessionBehavior ON COMMIT PRESERVE ROWS AS /*+ direct */
 SELECT
-    SessionStartDate
+  SessionStartDate
   ,Event_SoID
   ,Event_SessionKey
   ,TestGroupName
@@ -290,37 +264,9 @@ SELECT
 /* UNIVERSAL FLAGS HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ,COUNT(*) AS PVcnt
 /* CUSTOM TEST FLAGS HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  ,MAX(fSTL_RoomsWithThisItemClick) AS fSTL_RoomsWithThisItemClick
-  ,MAX(fRelatedProductClick) AS fRelatedProductClick
-  ,MAX(fCompareCarouselClick) AS fCompareCarouselClick
-  ,MAX(fCAVCarouselCLick) AS fCAVCarouselCLick
-  ,MAX(fSTL_TryThisLookAtHomeClick) AS fSTL_TryThisLookAtHomeClick
-  ,MAX(fVizconOpen) AS fVizconOpen
-  ,MAX(fDescriptionClick) AS fDescriptionClick -- control
-  ,MAX(fProductDetailsClick) AS fProductDetailsClick -- variation
-  ,MAX(fWaymoreVideoCLick) AS fWaymoreVideoCLick
-  ,MAX(fWaymoreMoreHighlightsClick) AS fWaymoreMoreHighlightsClick
-  ,MAX(fWeightsDimensionsClick) AS fWeightsDimensionsClick
-  ,MAX(fShippingClick) AS fShippingClick
-  ,MAX(fProtectionClick) AS fProtectionClick
-  ,MAX(fQAClick) AS fQAClick
-  ,MAX(fReviewsClick) AS fReviewsClick
-  ,MAX(fSpecificationsClick) AS fSpecificationsClick
-  ,MAX(fShopThisCollectionClick) AS fShopThisCollectionClick
-  ,MAX(fYouMightAlsoNeedClick) AS fYouMightAlsoNeedClick
-  ,MAX(fMoreFromThisShopClick) AS fMoreFromThisShopClick
-  /* Consolidated Drawer Inview Events */
-  ,MAX(fAtaGlanceInView) AS fAtaGlanceInView
-  ,MAX(fWeightDimensionsInView) AS fWeightDimensionsInView
-  ,MAX(fDescriptionInview) AS fDescriptionInview
-  ,MAX(fSpecInview) AS fSpecInview
-  ,MAX(fHighlightsInview) AS fHighlightsInview
-  ,MAX(fWaymoreMCBInview) AS fWaymoreMCBInview
-  ,MAX(fWaymoreBottomInview) AS fWaymoreBottomInview
-  /* flag indicating if a banner in the product description section was clicked */
-  ,MAX(EngagedProductDetails) AS EngagedProductDetails
-  ,MAX(EngagedAnyConsolidatedDrawerinControl) AS EngagedAnyConsolidatedDrawerinControl
-  ,MAX(EngagedBelowPDSection) AS EngagedBelowPDSection
+${data.ClickLocation ? renderSessFlags(data.ClickLocation).join('') : '-- No InView tracking submitted'}
+${data.WebAction ? renderSessFlags(data.WebAction).join('') : '-- No WebAction tracking submitted'}
+${data.InView ? renderSessFlags(data.InView).join('') : '-- No InView tracking submitted'}
 /* OTHER PDP FLAGS HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ,MAX(ProductAddToCart) AS ProductAddToCart
   ,MAX(ProductPlacedOrder) AS ProductPlacedOrder
@@ -351,37 +297,9 @@ SELECT csn_warp.fntblplwebstore(Event_SoID) AS Store
   ,TestGroupName
   ,COUNT(*) AS Cnt
   ,SUM(PVcnt) AS PVcnt
-  ,SUM(fCompareCarouselClick) AS fCompareCarouselClick
-  ,SUM(fSTL_RoomsWithThisItemClick) AS fSTL_RoomsWithThisItemClick
-  ,SUM(fRelatedProductClick) AS fRelatedProductClick
-  ,SUM(fCAVCarouselCLick) AS fCAVCarouselCLick
-  ,SUM(fSTL_TryThisLookAtHomeClick) AS fSTL_TryThisLookAtHomeClick
-  ,SUM(fVizconOpen) AS fVizconOpen
-  ,SUM(fDescriptionClick) AS fDescriptionClick -- control
-  ,SUM(fProductDetailsClick) AS fProductDetailsClick -- variation
-  ,SUM(fWaymoreVideoCLick) AS fWaymoreVideoCLick
-  ,SUM(fWaymoreMoreHighlightsClick) AS fWaymoreMoreHighlightsClick
-  ,SUM(fWeightsDimensionsClick) AS fWeightsDimensionsClick
-  ,SUM(fShippingClick) AS fShippingClick
-  ,SUM(fProtectionClick) AS fProtectionClick
-  ,SUM(fQAClick) AS fQAClick
-  ,SUM(fReviewsClick) AS fReviewsClick
-  ,SUM(fSpecificationsClick) AS fSpecificationsClick
-  ,SUM(fShopThisCollectionClick) AS fShopThisCollectionClick
-  ,SUM(fYouMightAlsoNeedClick) AS fYouMightAlsoNeedClick
-  ,SUM(fMoreFromThisShopClick) AS fMoreFromThisShopClick
-  /* Consolidated Drawer Inview Events */
-  ,SUM(fAtaGlanceInView) AS fAtaGlanceInView
-  ,SUM(fWeightDimensionsInView) AS fWeightDimensionsInView
-  ,SUM(fDescriptionInview) AS fDescriptionInview
-  ,SUM(fSpecInview) AS fSpecInview
-  ,SUM(fHighlightsInview) AS fHighlightsInview
-  ,SUM(fWaymoreMCBInview) AS fWaymoreMCBInview
-  ,SUM(fWaymoreBottomInview) AS fWaymoreBottomInview
-  /* flag indicating if a banner in the product description section was clicked */
-  ,SUM(EngagedProductDetails) AS EngagedProductDetails
-  ,SUM(EngagedAnyConsolidatedDrawerinControl) AS EngagedAnyConsolidatedDrawerinControl
-  ,SUM(EngagedBelowPDSection) AS EngagedBelowPDSection
+${data.ClickLocation ? renderAggregation(data.ClickLocation).join('') : '-- No InView tracking submitted'}
+${data.WebAction ? renderAggregation(data.WebAction).join('') : '-- No WebAction tracking submitted'}
+${data.InView ? renderAggregation(data.InView).join('') : '-- No InView tracking submitted'}
   ,SUM(ProductAddToCart) AS ProductAddToCart
   ,SUM(ProductPlacedOrder) AS ProductPlacedOrder
   ,SUM(HasWaymore) AS HasWaymore
@@ -402,37 +320,9 @@ SELECT csn_warp.fntblplwebstore(Event_SoID) AS Store
   ,csn_warp.fntblplVisitorType(VisitorTypeID) AS VisitorType
   ,TestGroupName
   ,COUNT(*) AS Cnt
-  ,SUM(fCompareCarouselClick) AS fCompareCarouselClick
-  ,SUM(fSTL_RoomsWithThisItemClick) AS fSTL_RoomsWithThisItemClick
-  ,SUM(fRelatedProductClick) AS fRelatedProductClick
-  ,SUM(fCAVCarouselCLick) AS fCAVCarouselCLick
-  ,SUM(fSTL_TryThisLookAtHomeClick) AS fSTL_TryThisLookAtHomeClick
-  ,SUM(fVizconOpen) AS fVizconOpen
-  ,SUM(fDescriptionClick) AS fDescriptionClick -- control
-  ,SUM(fProductDetailsClick) AS fProductDetailsClick -- variation
-  ,SUM(fWaymoreVideoCLick) AS fWaymoreVideoCLick
-  ,SUM(fWaymoreMoreHighlightsClick) AS fWaymoreMoreHighlightsClick
-  ,SUM(fWeightsDimensionsClick) AS fWeightsDimensionsClick
-  ,SUM(fShippingClick) AS fShippingClick
-  ,SUM(fProtectionClick) AS fProtectionClick
-  ,SUM(fQAClick) AS fQAClick
-  ,SUM(fReviewsClick) AS fReviewsClick
-  ,SUM(fSpecificationsClick) AS fSpecificationsClick
-  ,SUM(fShopThisCollectionClick) AS fShopThisCollectionClick
-  ,SUM(fYouMightAlsoNeedClick) AS fYouMightAlsoNeedClick
-  ,SUM(fMoreFromThisShopClick) AS fMoreFromThisShopClick
-  /* Consolidated Drawer Inview Events */
-  ,SUM(fAtaGlanceInView) AS fAtaGlanceInView
-  ,SUM(fWeightDimensionsInView) AS fWeightDimensionsInView
-  ,SUM(fDescriptionInview) AS fDescriptionInview
-  ,SUM(fSpecInview) AS fSpecInview
-  ,SUM(fHighlightsInview) AS fHighlightsInview
-  ,SUM(fWaymoreMCBInview) AS fWaymoreMCBInview
-  ,SUM(fWaymoreBottomInview) AS fWaymoreBottomInview
-  /* flag indicating if a banner in the product description section was clicked */
-  ,SUM(EngagedProductDetails) AS EngagedProductDetails
-  ,SUM(EngagedAnyConsolidatedDrawerinControl) AS EngagedAnyConsolidatedDrawerinControl
-  ,SUM(EngagedBelowPDSection) AS EngagedBelowPDSection
+${data.ClickLocation ? renderAggregation(data.ClickLocation).join('') : '-- No InView tracking submitted'}
+${data.WebAction ? renderAggregation(data.WebAction).join('') : '-- No WebAction tracking submitted'}
+${data.InView ? renderAggregation(data.InView).join('') : '-- No InView tracking submitted'}
   ,SUM(ProductAddToCart) AS ProductAddToCart
   ,SUM(ProductPlacedOrder) AS ProductPlacedOrder
   ,SUM(HasWaymore) AS HasWaymore
@@ -445,93 +335,6 @@ FROM tmpProductViewBehavior
 GROUP BY 1,2,3,4
 ORDER BY 1,2,3,4
 ;
-
-
--- session engagement cut x ATC/CV
-SELECT csn_warp.fntblplwebstore(Event_SoID) AS Store
-  ,'' Platform
-  ,'' Segment
-  ,TestGroupName
-  ,COUNT(*) AS Cnt
-  ,SUM(ProductAddToCart) AS ProductAddToCart
-  ,SUM(ProductPlacedOrder) AS ProductPlacedOrder
-FROM tmpSessionBehavior
-WHERE EngagedProductDetails = 1 -- engaged any Product Overview banner
-GROUP BY 1,2,3,4
-ORDER BY 1,2,3,4
-;
-
--- session engagement cut x ATC/CV
-SELECT csn_warp.fntblplwebstore(Event_SoID) AS Store
-  ,'' Platform
-  ,'' Segment
-  ,TestGroupName
-  ,COUNT(*) AS Cnt
-  ,SUM(ProductAddToCart) AS ProductAddToCart
-  ,SUM(ProductPlacedOrder) AS ProductPlacedOrder
-FROM tmpSessionBehavior
-WHERE fProductDetailsClick = 1 -- engaged any Product Overview banner
-GROUP BY 1,2,3,4
-ORDER BY 1,2,3,4
-;
-
-
-
--- OF those that engage PV
--- SELECT csn_warp.fntblplwebstore(Event_SoID) AS Store
--- 	,csn_warp.fntblPlPlatform(PlatformID) AS Platform
--- 	,csn_warp.fntblplVisitorType(VisitorTypeID) AS VisitorType
--- 	,TestGroupName
--- 	,COUNT(*) AS Cnt
--- 	,SUM(ProductAddToCart) AS ProductAddToCart
--- 	,SUM(ProductPlacedOrder) AS ProductPlacedOrder
--- FROM tblProductViewEngagement
--- WHERE EngagedProductDetails = 1 -- engaged any Product Overview banner
--- GROUP BY 1,2,3,4
--- ORDER BY 1,2,3,4
--- ;
-
--- (Session) of those that click into Product Details, % Inview engagement
-SELECT csn_warp.fntblplwebstore(Event_SoID) AS Store
-  ,csn_warp.fntblPlPlatform(PlatformID) AS Platform
-  ,csn_warp.fntblplVisitorType(VisitorTypeID) AS VisitorType
-  ,TestGroupName
-  ,COUNT(*) AS Cnt
-  ,SUM(fAtaGlanceInView) AS fAtaGlanceInView
-  ,SUM(fWeightDimensionsInView) AS fWeightDimensionsInView
-  ,SUM(fDescriptionInview) AS fDescriptionInview
-  ,SUM(fSpecInview) AS fSpecInview
-  ,SUM(fHighlightsInview) AS fHighlightsInview
-  ,SUM(fWaymoreVideoCLick) AS fWaymoreVideoCLick
-  ,SUM(fWaymoreMoreHighlightsClick) AS fWaymoreMoreHighlightsClick
-  ,SUM(fWaymoreMCBInview) AS fWaymoreMCBInview
-  ,SUM(fWaymoreBottomInview) AS fWaymoreBottomInview
-FROM tmpSessionBehavior
-WHERE fProductDetailsClick = 1 -- clicked into Product Details
-GROUP BY 1,2,3,4
-ORDER BY 1,2,3,4
-;
-
-(PV) of those that click into Product Details, % Inview engagement
-SELECT csn_warp.fntblplwebstore(Event_SoID) AS Store
-  ,csn_warp.fntblPlPlatform(PlatformID) AS Platform
-  ,csn_warp.fntblplVisitorType(VisitorTypeID) AS VisitorType
-  ,TestGroupName
-  ,COUNT(*) AS Cnt
-  ,SUM(fAtaGlanceInView) AS fAtaGlanceInView
-  ,SUM(fWeightDimensionsInView) AS fWeightDimensionsInView
-  ,SUM(fDescriptionInview) AS fDescriptionInview
-  ,SUM(fSpecInview) AS fSpecInview
-  ,SUM(fHighlightsInview) AS fHighlightsInview
-  ,SUM(fWaymoreVideoCLick) AS fWaymoreVideoCLick
-  ,SUM(fWaymoreMoreHighlightsClick) AS fWaymoreMoreHighlightsClick
-  ,SUM(fWaymoreMCBInview) AS fWaymoreMCBInview
-  ,SUM(fWaymoreBottomInview) AS fWaymoreBottomInview
-FROM tmpProductViewBehavior
-WHERE fProductDetailsClick = 1 -- clicked into Product Details
-GROUP BY 1,2,3,4
-ORDER BY 1,2,3,4
-;    
 `
   resolve(script);
   });
@@ -552,6 +355,24 @@ function renderTracking(trackingData, column) {
 function renderPVFlags(trackingData, prefix) {
   let arr = trackingData.split(",").map(elem => {
       return `  ,${prefix}.f${elem.toLowerCase()}\n`;
+  });
+  let lastElem = arr.pop().replace('\n', '');
+  arr.push(lastElem);
+  return arr;
+};
+
+function renderSessFlags(trackingData) {
+  let arr = trackingData.split(",").map(elem => {
+    return `  ,MAX(f${elem.toLowerCase()}) AS f${elem.toLowerCase()}\n`;
+  });
+  let lastElem = arr.pop().replace('\n', '');
+  arr.push(lastElem);
+  return arr;
+};
+
+function renderAggregation(trackingData) {
+  let arr = trackingData.split(",").map(elem => {
+    return `  ,SUM(f${elem.toLowerCase()}) AS f${elem.toLowerCase()}\n`;
   });
   let lastElem = arr.pop().replace('\n', '');
   arr.push(lastElem);
