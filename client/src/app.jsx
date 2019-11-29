@@ -47,6 +47,7 @@ export default function App() {
     .then(response => {
       setScript1(response.data.script1);
       setShowScript1(true);
+      setShowScript2(false);
       setScript2(response.data.script2);
     })
     .catch(err => {
