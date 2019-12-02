@@ -155,10 +155,10 @@ export default function App() {
           <DatePicker dateFormat="yyyy-MM-dd" placeholderText="select start date" className="entry-input" name="startDate" maxDate={new Date()} selected={StartDate} onChange={(e) => setStartDate(e)}/>
           <DatePicker dateFormat="yyyy-MM-dd" placeholderText="select end date" className="entry-input" name="endDate" minDate={StartDate} maxDate={new Date()} selected={EndDate} onChange={(e) => setEndDate(e)}/>
           <div></div>
-          <div className="input-name"><span>Platform(s)</span></div>
-          <div className="input-name"><span>Device(s)</span></div>
-          <div className="input-name"><span>Store(s)</span></div>
-          <div className="input-name"><span>Operating System(s)</span></div>
+          <div className="input-name"><span>Platforms</span></div>
+          <div className="input-name"><span>Devices</span></div>
+          <div className="input-name"><span>Stores</span></div>
+          <div className="input-name"><span>Operating Systems</span></div>
           <div className="checkbox-div" onChange={(e) => updateStateArray(e, Platforms, setPlatforms)}>
             <input type="checkbox" value="1"/> Desktop<br/>
             <input type="checkbox" value="2"/> Mweb<br/>
