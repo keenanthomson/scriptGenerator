@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Web app for generating SQL scripts",
   "main": "index.js",
+  "engines": { "node": "10.16.0" },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server/server.js",

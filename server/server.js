@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const port = 3001;
+const port = process.env.port || 3001;
 const generateScripts = require('./scriptGenerator/generateScripts.js');
 
 app.use(bodyParser.json());
@@ -14,7 +14,7 @@ app.listen(port, () => {
 
 app.post('/api/renderscripts', (req, res) => {
   generateScripts(req.body)
-  .then((data) => {
+  .then(data => {
     res.send(data);
   });
 });
