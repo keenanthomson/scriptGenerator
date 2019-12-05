@@ -136,7 +136,7 @@ export default function App() {
       <div className="box">
         <div className="header">SQL Script Generator</div>
         <div className="entries-header">
-          PRIMARY KPIS SCRIPT
+          PRIMARY KPI SCRIPT
         </div>
         <div className="entries-primary">
         <div className="input-name"><span>Analyst Initials</span></div>
