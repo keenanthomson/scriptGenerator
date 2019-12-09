@@ -1,6 +1,7 @@
 * {
   font-family: akkurta,Inconsolata,monospace;
   box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
 }
 
 .box {
@@ -14,7 +15,7 @@
 
 .entries-header {
   background-color:  #eff3f6;
-  border-radius: 5px 5px 0 0;
+  /* border-radius: 5px 5px 0 0; */
   border: 1px solid #dfe2e5;
   border-bottom: 1px solid black;
   padding: 10px;
@@ -26,14 +27,14 @@
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 2fr 2fr 2fr 2fr 2fr 7.25fr;
   background-color:  #eff3f6;
-  border-radius: 0 0 5px 5px;
+  /* border-radius: 0 0 5px 5px; */
   border: 1px solid #dfe2e5;
   padding: 10px;
 }
 
 .entries-secondary {
   background-color:  #eff3f6;
-  border-radius: 0 0 5px 5px;
+  /* border-radius: 0 0 5px 5px; */
   border: 1px solid #dfe2e5;
 }
 
@@ -48,7 +49,7 @@
   margin: 6px;
   padding: 5px;
   width: 90%;
-  border-radius: 3px;
+  /* border-radius: 3px; */
   border-color: slategray;
   border-width: 1px;
   background-color: rgb(254, 254, 254);
@@ -68,7 +69,7 @@
 
 .button {
   font-size: 16px;
-  border-radius: 5px;
+  /* border-radius: 5px; */
   color: #24292e;
   background-color: #eff3f6;
 }
@@ -94,14 +95,14 @@
 
 .button-toggle {
   font-size: 16px;
-  border-radius: 5px 5px 0 0;
+  /* border-radius: 5px 5px 0 0; */
   border-bottom: 0;
   color: #24292e;
 }
 
 .button-toggle-selected {
   font-size: 16px;
-  border-radius: 5px 5px 0 0;
+  /* border-radius: 5px 5px 0 0; */
   border-bottom: 0;
   color: #24292e;
   background-color: #eff3f6;
