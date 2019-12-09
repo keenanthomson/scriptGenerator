@@ -205,7 +205,8 @@ SELECT
 ${data.ClickLocation ? renderPVFlags(data.ClickLocation, 'cl').join('') : '-- No InView tracking submitted'}
 ${data.WebAction ? renderPVFlags(data.WebAction, 'et').join('') : '-- No WebAction tracking submitted'}
 ${data.InView ? renderPVFlags(data.InView, 'iv').join('') : '-- No InView tracking submitted'}
-/* catch all flags indicating */
+/* catch all flags */
+ -- *flag logic TBD*
 /* OTHER PDP FLAGS HERE */ --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ,pv.ProductAddToCart
   ,pv.ProductPlacedOrder
